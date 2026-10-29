@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Caseload – case manager</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#F3F4F8;--sf:#fff;--ink:#17213A;--mute:#66708A;--line:#DDE1EC;--brand:#1F3A6B;--bi:#fff;--acc:#E4572E;--hi:#FBE0D8;--hit:#9A2B0E;--md:#FFF0C7;--mdt:#6B4B00;--lo:#E6E9F2;--lot:#4A546E;--ok:#DAF1E3;--okt:#0B5B3B;--sh:0 1px 2px rgba(23,33,58,.08);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0E1424;--sf:#172038;--ink:#E8ECF7;--mute:#97A2BE;--line:#27324F;--brand:#8FB0F5;--bi:#0E1424;--acc:#FF8A63;--hi:#432019;--hit:#FFB9A3;--md:#3B3210;--mdt:#FFD97A;--lo:#27324F;--lot:#B4BED6;--ok:#14382B;--okt:#8FE3BC;color-scheme:dark}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 Manrope,system-ui,sans-serif}
+h1,h2,h3,.big{font-family:Fraunces,Georgia,serif;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#app{max-width:680px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(48px + env(safe-area-inset-bottom,0px))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+h1{font-size:30px;letter-spacing:-.01em}
+.btn{border:0;border-radius:12px;background:var(--brand);color:var(--bi);font-weight:700;padding:11px 16px;text-decoration:none;display:inline-block;text-align:center}
+.btn.alt{background:var(--sf);color:var(--ink);border:1px solid var(--line)}
+.btn.warn{background:var(--hi);color:var(--hit)}
+.btn:disabled{opacity:.5}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.st{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:var(--sh)}
+.st .big{font-size:26px;font-weight:700;line-height:1}.st span{font-size:12px;color:var(--mute)}.st.hot .big{color:var(--acc)}
+.bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.bar #q{flex:1 1 100%}.bar select{flex:1 1 0}
+.in{width:100%;border:1px solid var(--line);background:var(--sf);border-radius:12px;padding:10px 12px;min-width:0}
+.card{display:block;width:100%;text-align:left;background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:8px;box-shadow:var(--sh)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.card b{font-size:16px}
+.sub{color:var(--mute);font-size:13px}
+.tag{display:inline-block;border-radius:8px;padding:3px 9px;font-size:12px;font-weight:700;background:var(--lo);color:var(--lot)}
+.tag.High{background:var(--hi);color:var(--hit)}.tag.Medium{background:var(--md);color:var(--mdt)}.tag.Closed{background:var(--ok);color:var(--okt)}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.late{color:var(--hit);font-weight:700}.empty{text-align:center;color:var(--mute);padding:32px 0}
+.panel{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.panel h3{font-size:17px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+label{display:block;font-size:12px;font-weight:700;color:var(--mute);margin:0 0 4px}.f{margin-bottom:10px}
+.task{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.task input{width:20px;height:20px;accent-color:var(--brand)}.task.d span{text-decoration:line-through;color:var(--mute)}.task span{flex:1}
+.x{border:0;background:none;color:var(--mute);font-size:18px}
+.note{border-left:3px solid var(--acc);padding:2px 0 2px 12px;margin:0 0 12px}.note p{margin:2px 0;white-space:pre-wrap}
+.add{display:flex;gap:8px;margin-top:10px}a{color:var(--brand);font-weight:600}
+.alert{background:var(--md);color:var(--mdt);border-radius:14px;padding:12px 14px;margin-bottom:12px}.alert b{display:block;margin-bottom:4px}
+.lnk{display:block;border:0;background:none;padding:5px 0;text-align:left;font-weight:600;color:inherit;text-decoration:underline}
+.ok{color:var(--okt);font-weight:700}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app"><div class="empty">Loading…</div></div>
+<script>
+(function(){
+var API="https://mpwacnjzyalxpmdflhib.supabase.co/functions/v1/caseload-api";
+var ST=["Open","In progress","On hold","Closed"],PR=["High","Medium","Low"],TYPES=["Memo","Letter","Other"];
+var S={v:"auth",mode:"login",err:"",q:"",f:"Active",s:"All staff",id:null,busy:false,info:""},ME=null,CASES=[],STAFF=[],BOT=null,TOK="";
+try{TOK=localStorage.getItem("caseload-token")||""}catch(e){}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function plus(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+function fd(s){return s?new Date(s+"T00:00:00").toLocaleDateString([],{month:"short",day:"numeric"}):"No due date"}
+function isMgr(){return ME&&ME.role==="manager"}
+function call(action,data){
+  var h={"Content-Type":"application/json"};if(TOK)h["x-session"]=TOK;
+  return fetch(API,{method:"POST",headers:h,body:JSON.stringify(Object.assign({action:action},data||{}))}).then(function(r){return r.json().then(function(j){
+    if(r.status===401&&action!=="login"&&action!=="signup"){out();throw new Error("auth")}
+    if(!r.ok)throw new Error(j.error||"Something went wrong.");return j})},function(){throw new Error("Cannot reach the server. Check your internet.")})}
+function out(){TOK="";ME=null;try{localStorage.removeItem("caseload-token")}catch(e){}S.v="auth";S.err="";draw()}
+function sel(id,arr,v,dis,fld){return '<select class="in" id="'+id+'"'+(fld?' data-fld="'+fld+'"':'')+(dis?' disabled':'')+'>'+arr.map(function(o){return'<option'+(o===v?' selected':'')+'>'+o+'</option>'}).join('')+'</select>'}
+function get(id){return CASES.filter(function(c){return c.id===id})[0]}
+function late(c){return c.status!=="Closed"&&c.due&&c.due<iso(new Date())}
+function load(){return call("cases").then(function(j){CASES=j.cases;if(isMgr())return call("staff_list").then(function(k){STAFF=k.staff})})}
+function boot(){
+  if(!TOK){draw();return}
+  call("me").then(function(j){ME=j.user;return load()}).then(function(){S.v="list";draw()}).catch(function(e){if(e.message!=="auth"){S.v="auth";S.err=e.message;draw()}})}
+function authV(){var su=S.mode==="signup";
+  return '<div class="top"><h1>Caseload</h1></div><div class="panel"><div class="grid2" style="margin-bottom:14px"><button class="btn'+(su?' alt':'')+'" data-mode="login">Log in</button><button class="btn'+(su?'':' alt')+'" data-mode="signup">Sign up</button></div>'+
+  (su?'<div class="f"><label for="an">Your name</label><input class="in" id="an" autocomplete="name"></div>':'')+
+  '<div class="f"><label for="am">Mobile number</label><input class="in" id="am" inputmode="tel" autocomplete="tel" placeholder="e.g. 7771234"></div>'+
+  '<div class="f"><label for="ar">Record card number'+(su?' (staff)':' (staff only)')+'</label><input class="in" id="ar" autocomplete="off"></div>'+
+  '<div class="f"><label for="ap">Password</label><input class="in" id="ap" type="password" autocomplete="'+(su?'new-password':'current-password')+'"></div>'+
+  (su?'<div class="f"><label for="ac">Confirm password</label><input class="in" id="ac" type="password" autocomplete="new-password"></div>':'')+
+  (S.err?'<div class="late" style="margin-bottom:10px" role="alert">'+esc(S.err)+'</div>':'')+
+  '<button class="btn" data-go="1" style="width:100%"'+(S.busy?' disabled':'')+'>'+(S.busy?'Please wait…':su?'Create account':'Log in')+'</button>'+
+  '<p class="sub" style="margin:12px 0 0">'+(su?'The first account is the manager. Staff can sign up only after the manager registers their record card number.':'Staff must also enter their record card number.')+'</p></div>'}
+function banner(){
+  var t=iso(new Date()),n=plus(1),a=[],ln=function(l,f){return CASES.filter(f).map(function(c){return'<button class="lnk" data-open="'+c.id+'">'+l+' · '+esc(c.client)+' ('+c.id+')</button>'}).join('')};
+  var h=ln("Due tomorrow",function(c){return c.status!=="Closed"&&c.due===n})+ln("Due today",function(c){return c.status!=="Closed"&&c.due===t})+ln("Overdue",late);
+  return h?'<div class="alert" role="status"><b>Reminders</b>'+h+'</div>':''}
+function match(c){var q=S.q.toLowerCase();
+  if(q&&(c.client+" "+c.id+" "+c.type).toLowerCase().indexOf(q)<0)return false;
+  if(S.s!=="All staff"&&(S.s==="Unassigned"?c.staff_name:c.staff_name!==S.s))return false;
+  return S.f==="All"||(S.f==="Active"?c.status!=="Closed":c.status===S.f)}
+function rows(){return CASES.filter(match).sort(function(a,b){if((a.status==="Closed")!==(b.status==="Closed"))return a.status==="Closed"?1:-1;return (a.due||"9999").localeCompare(b.due||"9999")})}
+function cards(r){
+  if(!r.length)return '<div class="empty">'+(isMgr()?'No cases match. Tap “New case” to add one.':'No cases are assigned to you yet.')+'</div>';
+  return r.map(function(c){var dn=c.tasks.filter(function(x){return x.done}).length;
+    return '<button class="card" data-open="'+c.id+'"><div class="row"><b>'+esc(c.client)+'</b><span class="tag '+c.pri+'">'+c.pri+'</span></div><div class="sub">'+c.id+' · '+esc(c.type)+(c.staff_name?' · '+esc(c.staff_name):'')+'</div><div class="meta"><span class="tag '+(c.status==="Closed"?"Closed":"")+'">'+c.status+'</span><span class="'+(late(c)?'late':'sub')+'">'+(late(c)?'Overdue · ':'Due ')+fd(c.due)+'</span>'+(c.tasks.length?'<span class="sub">'+dn+'/'+c.tasks.length+' tasks</span>':'')+'</div></button>'}).join('')}
+function listV(){
+  var open=CASES.filter(function(c){return c.status!=="Closed"&&(S.s==="All staff"||(S.s==="Unassigned"?!c.staff_name:c.staff_name===S.s))}),t=iso(new Date()),w=plus(7);
+  var hi=open.filter(function(c){return c.pri==="High"}).length,ov=open.filter(late).length,wk=open.filter(function(c){return c.due&&c.due>=t&&c.due<=w}).length;
+  var names=[];CASES.forEach(function(c){if(c.staff_name&&names.indexOf(c.staff_name)<0)names.push(c.staff_name)});
+  return '<div class="top"><h1>Caseload</h1><div style="display:flex;gap:8px"><button class="btn alt" data-logout="1">Log out</button>'+(isMgr()?'<button class="btn alt" data-staff="1">Staff</button><button class="btn" data-new="1">+ New case</button>':'')+'</div></div>'+
+  '<div class="sub" style="margin:-6px 0 12px">Signed in as '+esc(ME.name)+' · '+(isMgr()?'Manager':'Staff')+'</div>'+banner()+
+  (ME.telegram?'':'<button class="btn alt" data-tglink="1" style="width:100%;margin-bottom:12px">Connect Telegram to get case updates</button>')+
+  (S.info?'<div class="alert" role="status">'+esc(S.info)+'</div>':'')+
+  '<div class="stats"><div class="st"><div class="big">'+open.length+'</div><span>Open</span></div><div class="st'+(hi?' hot':'')+'"><div class="big">'+hi+'</div><span>High priority</span></div><div class="st'+(ov?' hot':'')+'"><div class="big">'+ov+'</div><span>Overdue</span></div><div class="st"><div class="big">'+wk+'</div><span>Due in 7 days</span></div></div>'+
+  '<div class="bar"><input class="in" id="q" placeholder="Search client, ID or type" value="'+esc(S.q)+'"><select class="in" id="fl">'+["Active","All"].concat(ST).map(function(o){return'<option'+(o===S.f?' selected':'')+'>'+o+'</option>'}).join('')+'</select>'+
+  (isMgr()&&names.length?'<select class="in" id="fst" aria-label="Filter by staff">'+["All staff","Unassigned"].concat(names).map(function(o){return'<option'+(o===S.s?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select>':'')+'</div><div id="cl">'+cards(rows())+'</div>'}
+function staffSel(id,v){return '<select class="in" id="'+id+'"><option value="">Unassigned</option>'+STAFF.map(function(s){return'<option value="'+s.id+'"'+(s.id===v?' selected':'')+'>'+esc(s.name)+'</option>'}).join('')+'</select>'}
+function newV(){
+  return '<div class="top"><h1>New case</h1><button class="btn alt" data-back="1">Cancel</button></div><div class="panel"><div class="f"><label for="nc">Client name</label><input class="in" id="nc" autocomplete="off"></div>'+
+  '<div class="grid"><div class="f"><label for="nt">Type</label>'+sel("nt",TYPES,"Memo")+'</div><div class="f"><label for="nr">Priority</label>'+sel("nr",PR,"Medium")+'</div><div class="f"><label for="nd">Due date</label><input class="in" type="date" id="nd" value="'+plus(7)+'"></div></div>'+
+  '<div class="f"><label for="na">Assigned to</label>'+staffSel("na","")+'</div><div class="f"><label for="ns">Summary</label><textarea class="in" id="ns" rows="3"></textarea></div>'+
+  (S.err?'<div class="late" style="margin-bottom:10px" role="alert">'+esc(S.err)+'</div>':'')+'<button class="btn" data-create="1" style="width:100%"'+(S.busy?' disabled':'')+'>Create case</button></div>'}
+function caseV(c){var m=isMgr();
+  return '<div class="top"><button class="btn alt" data-back="1">← Cases</button><span class="sub">'+c.id+' · '+esc(c.type)+'</span></div><h2 style="font-size:26px;margin-bottom:10px">'+esc(c.client)+'</h2>'+
+  (S.info?'<div class="alert" role="status">'+esc(S.info)+'</div>':'')+
+  '<div class="panel"><div class="grid"><div class="f"><label for="fs">Status</label>'+sel("fs",ST,c.status,false,"status")+'</div><div class="f"><label for="fp">Priority</label>'+sel("fp",PR,c.pri,!m,"pri")+'</div><div class="f"><label for="fdv">Due</label><input class="in" type="date" id="fdv" data-fld="due" value="'+esc(c.due||"")+'"'+(m?'':' disabled')+'></div></div>'+
+  '<div class="f"><label for="fa">Assigned to</label>'+(m?staffSel("fa",c.staff_id).replace('<select class="in" id="fa"','<select class="in" id="fa" data-fld="staff_id"'):'<div>'+esc(c.staff_name||"Unassigned")+'</div>')+'</div>'+(c.summary?'<p style="margin:4px 0 0">'+esc(c.summary)+'</p>':'')+'</div>'+
+  '<div class="panel"><h3>Tasks</h3>'+(c.tasks.length?c.tasks.map(function(t){return'<div class="task'+(t.done?' d':'')+'"><input type="checkbox" data-tt="'+t.id+'" aria-label="Done"'+(t.done?' checked':'')+(m?'':' disabled')+'><span>'+esc(t.text)+'</span>'+(m?'<button class="x" data-rt="'+t.id+'" aria-label="Remove task">×</button>':'')+'</div>'}).join(''):'<div class="sub">No tasks yet.</div>')+(m?'<div class="add"><input class="in" id="nt2" placeholder="Add a task"><button class="btn" data-addtask="1">Add</button></div>':'')+'</div>'+
+  '<div class="panel"><h3>Case notes</h3>'+(m?'<textarea class="in" id="nn" rows="3" placeholder="Write a note about contact, decisions or next steps"></textarea><div class="add"><button class="btn" data-addnote="1" style="width:100%">Save note</button></div>':'')+'<div style="margin-top:16px">'+(c.notes.length?c.notes.map(function(n){return'<div class="note"><div class="sub">'+esc(n.author||"")+' · '+new Date(n.ts).toLocaleString([],{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})+'</div><p>'+esc(n.text)+'</p></div>'}).join(''):'<div class="sub">No notes yet.</div>')+'</div></div>'+
+  (m?'<button class="btn warn" data-del="1" style="width:100%">'+(S.del?'Tap again to delete this case':'Delete case')+'</button>':'')}
+function staffV(){
+  return '<div class="top"><h1>Staff</h1><button class="btn alt" data-back="1">← Cases</button></div>'+
+  '<div class="panel"><h3>Telegram bot</h3>'+(BOT?'<p style="margin:0 0 6px" class="ok">Connected: @'+esc(BOT)+'</p><div class="sub">Everyone taps “Connect Telegram” on the Cases screen to receive updates.</div>':'<div class="sub" style="margin-bottom:10px">Create a bot with @BotFather in Telegram, then paste its token here. The token is stored on the server only.</div><div class="f"><label for="bt">Bot token</label><input class="in" id="bt" type="password" autocomplete="off"></div><button class="btn" data-bot="1" style="width:100%"'+(S.busy?' disabled':'')+'>Connect bot</button>')+'</div>'+
+  '<div class="panel"><h3>Register staff</h3><div class="sub" style="margin-bottom:10px">Staff sign up and log in with their record card number. If you leave the mobile blank it is linked when they sign up.</div><div class="f"><label for="sn">Name</label><input class="in" id="sn" autocomplete="off"></div><div class="f"><label for="sm">Mobile number (optional)</label><input class="in" id="sm" inputmode="tel"></div><div class="f"><label for="sc">Record card number</label><input class="in" id="sc" autocomplete="off"></div>'+
+  (S.err?'<div class="late" style="margin-bottom:10px" role="alert">'+esc(S.err)+'</div>':'')+'<button class="btn" data-addstf="1" style="width:100%">Add staff</button></div>'+
+  '<div class="panel"><h3>Registered staff</h3>'+(STAFF.length?STAFF.map(function(x){return'<div class="task"><span>'+esc(x.name)+'<div class="sub">'+(x.mobile?esc(x.mobile):'Not signed up yet')+' · Card '+esc(x.card)+(x.telegram?' · Telegram connected':'')+'</div></span><button class="x" data-rmstf="'+x.id+'" aria-label="Remove staff">×</button></div>'}).join(''):'<div class="sub">No staff registered yet.</div>')+'</div>'}
+function draw(){var a=$("app");
+  if(!ME||S.v==="auth")a.innerHTML=authV();
+  else if(S.v==="staff"&&isMgr())a.innerHTML=staffV();
+  else if(S.v==="new"&&isMgr())a.innerHTML=newV();
+  else if(S.v==="case"&&get(S.id))a.innerHTML=caseV(get(S.id));
+  else{S.v="list";a.innerHTML=listV()}}
+function run(p,done){S.busy=true;S.err="";draw();return p.then(function(r){S.busy=false;if(done)return done(r)}).catch(function(e){S.busy=false;if(e.message!=="auth"){S.err=e.message}draw()})}
+function reload(msg){return load().then(function(){S.info=msg||"";draw()}).catch(function(e){if(e.message!=="auth"){S.err=e.message;draw()}})}
+function act(p,msg){return p.then(function(){return reload(msg)}).catch(function(e){if(e.message!=="auth"){S.info=e.message;draw()}})}
+function enter(j){TOK=j.token;ME=j.user;try{localStorage.setItem("caseload-token",TOK)}catch(e){}return load().then(function(){S.v="list";S.err="";draw()})}
+$("app").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;var d=b.dataset,c=get(S.id);
+  if(d.mode){S.mode=d.mode;S.err="";draw()}
+  else if(d.go){var su=S.mode==="signup",m=$("am").value,pw=$("ap").value,card=$("ar").value;
+    if(su&&pw!==$("ac").value){S.err="Passwords do not match.";draw();return}
+    run(call(su?"signup":"login",{name:su?$("an").value:"",mobile:m,password:pw,card:card}),enter)}
+  else if(d.logout){call("logout").catch(function(){});out()}
+  else if(d.open){S.v="case";S.id=d.open;S.del=false;S.info="";draw();window.scrollTo(0,0)}
+  else if(d.back){S.v="list";S.err="";S.info="";S.del=false;draw()}
+  else if(d.new){S.v="new";S.err="";draw()}
+  else if(d.staff){S.v="staff";S.err="";call("bot_status").then(function(j){BOT=j.username}).catch(function(){}).then(draw)}
+  else if(d.create){var n=$("nc").value.trim();if(!n){$("nc").focus();return}
+    run(call("case_create",{client:n,type:$("nt").value,pri:$("nr").value,due:$("nd").value,summary:$("ns").value,staff_id:$("na").value}),function(r){return load().then(function(){S.v="case";S.id=r.id;S.info="Case opened. The assigned staff and manager were notified on Telegram if connected.";draw()})})}
+  else if(d.addtask){var t=$("nt2").value.trim();if(t)act(call("task_add",{id:c.id,text:t}))}
+  else if(d.rt){act(call("task_remove",{task:+d.rt}))}
+  else if(d.addnote){var x=$("nn").value.trim();if(x)act(call("note_add",{id:c.id,text:x}))}
+  else if(d.del){if(!S.del){S.del=true;draw()}else call("case_delete",{id:c.id}).then(function(){S.v="list";S.del=false;return reload()}).catch(function(){})}
+  else if(d.addstf){S.err="";call("staff_add",{name:$("sn").value,mobile:$("sm").value,card:$("sc").value}).then(function(){return load()}).then(draw).catch(function(er){if(er.message!=="auth"){S.err=er.message;draw()}})}
+  else if(d.rmstf){call("staff_remove",{id:d.rmstf}).then(load).then(draw).catch(function(){})}
+  else if(d.bot){var tk=$("bt").value;run(call("bot_setup",{token:tk}),function(r){BOT=r.username;draw()})}
+  else if(d.tglink){call("tg_link").then(function(r){window.open(r.url,"_blank","noopener");S.info="Telegram opened. Tap Start in the bot chat, then come back here.";draw()}).catch(function(er){S.info=er.message;draw()})}
+});
+$("app").addEventListener("change",function(e){var t=e.target,c=get(S.id);
+  if(t.dataset.tt)act(call("task_toggle",{task:+t.dataset.tt,done:t.checked}));
+  else if(t.dataset.fld){var f={};f[t.dataset.fld]=t.value;act(call("case_update",{id:c.id,fields:f}),t.dataset.fld==="status"?"Status updated.":"Saved.")}
+  else if(t.id==="fl"){S.f=t.value;draw()}
+  else if(t.id==="fst"){S.s=t.value;draw()}
+});
+$("app").addEventListener("input",function(e){if(e.target.id==="q"){S.q=e.target.value;$("cl").innerHTML=cards(rows())}});
+$("app").addEventListener("keydown",function(e){if(e.key==="Enter"&&S.v==="auth"&&e.target.tagName==="INPUT"){var g=document.querySelector("[data-go]");if(g)g.click()}});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&ME&&S.v==="list")call("me").then(function(j){ME=j.user;return load()}).then(draw).catch(function(){})});
+boot();
+})();
+</script>
+</body>
+</html>
