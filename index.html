@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05307A">
+<title>Caseload – case manager</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--bg:#EAF1FD;--sf:#fff;--ink:#0B2C66;--mute:#7388AB;--line:#DCE6F7;--brand:#2A6BD6;--bi:#fff;--side:#05307A;--side2:#03246A;--soft:#F3F7FE;--t0:#6C5CFF;--t1:#00A3B4;--t2:#E26EA0;--t3:#2A6BD6;--hi:#FDE3E3;--hit:#B42318;--md:#FFF1C9;--mdt:#8A5A00;--ok:#D6F5E3;--okt:#0B6B3E;--lo:#EEF3FB;--lot:#4A5F86;--sh:0 2px 8px rgba(11,44,102,.07);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0A1428;--sf:#121E3A;--ink:#E8EEFC;--mute:#8CA0C6;--line:#213056;--brand:#6EA0FF;--bi:#0A1428;--side:#06122B;--side2:#030B1C;--soft:#17254A;--hi:#3A1A1A;--hit:#FDA29B;--md:#3A2E0E;--mdt:#FEC84B;--ok:#0E3322;--okt:#6CE9A6;--lo:#1B2950;--lot:#B6C0D8;--sh:0 2px 8px rgba(0,0,0,.35);color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:500 15px/1.45 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.01em}h3{font-size:17px;margin:20px 0 10px}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;touch-action:manipulation}
+button:active:not(:disabled){transform:scale(.98)}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+svg{flex:0 0 auto}
+.shell{display:block;min-height:100vh}
+.side{display:none}
+.main{padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(100px + env(safe-area-inset-bottom,0px))}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:var(--sf);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button{flex:1;display:grid;justify-items:center;gap:2px;border:0;background:none;font-size:11px;font-weight:700;color:var(--mute);padding:6px 0;min-height:54px}.tabbar button.on{color:var(--brand)}
+.mtop{display:flex;align-items:center;gap:10px;margin-bottom:12px}.mtop b{font-size:18px}.mtop .grow{flex:1}
+@media (min-width:900px){
+  body{padding:24px}
+  .shell{display:grid;grid-template-columns:240px 1fr;max-width:1240px;margin:0 auto;border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(11,44,102,.2);min-height:calc(100vh - 48px);background:var(--bg)}
+  .side{display:flex;flex-direction:column;background:var(--side);color:#fff;padding:28px 0}
+  .tabbar,.mtop{display:none}
+  .main{padding:28px}
+  .cols{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
+}
+.me{display:grid;justify-items:center;gap:4px;padding:0 16px 26px}.me small{opacity:.7}.me b{font-size:15px}
+.nv{display:flex;gap:12px;align-items:center;width:100%;border:0;background:none;color:#fff;padding:13px 28px;font-weight:700;font-size:15px;text-align:left;opacity:.9}.nv.on{background:var(--side2);opacity:1}.grow{flex:1}
+.av{width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--brand);display:inline-grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto}.av.xl{width:62px;height:62px;font-size:20px;background:#fff;color:var(--side)}
+.search{position:relative}.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9DB3D9}.search .in{padding-left:46px;border:0;border-radius:999px;background:#F6F9FF;box-shadow:var(--sh)}
+@media (prefers-color-scheme:dark){.search .in{background:var(--sf)}}
+.in{width:100%;min-height:48px;border:1px solid var(--line);background:var(--sf);border-radius:14px;padding:11px 14px;min-width:0;font-size:16px}
+textarea.in{min-height:92px;resize:vertical}select.in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 20px) 55%,calc(100% - 15px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}.in:disabled{opacity:.6}
+.btn{min-height:48px;border:0;border-radius:14px;background:var(--brand);color:var(--bi);font-weight:700;padding:12px 18px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn.alt{background:var(--sf);color:var(--ink);border:1px solid var(--line)}.btn.warn{background:var(--hi);color:var(--hit)}.btn.sm{min-height:36px;padding:6px 12px;font-size:13px;border-radius:10px}.btn:disabled{opacity:.5}.btn.full{width:100%}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:560px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{border:0;border-radius:18px;padding:14px;color:#fff;text-align:left;min-height:108px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--sh)}
+.tile.t0{background:var(--t0)}.tile.t1{background:var(--t1)}.tile.t2{background:var(--t2)}.tile.t3{background:var(--t3)}
+.tile.on{outline:3px solid var(--ink);outline-offset:2px}.tile b{display:block;font-size:15px}.tile small{opacity:.9;font-size:12.5px;font-weight:600}
+.ico{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center}.tile.t0 .ico{color:var(--t0)}.tile.t1 .ico{color:var(--t1)}.tile.t2 .ico{color:var(--t2)}.tile.t3 .ico{color:var(--t3)}
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.type{border:0;background:var(--sf);border-radius:16px;padding:12px;text-align:left;box-shadow:var(--sh);min-height:92px;display:flex;flex-direction:column;justify-content:space-between;color:var(--ink)}
+.type svg{color:var(--t0)}.type.k1 svg{color:var(--t1)}.type.k2 svg{color:var(--t2)}.type b{display:block;font-size:14px}.type small{color:var(--mute);font-weight:600;font-size:12px}.type.on{outline:3px solid var(--brand);outline-offset:2px}
+.type.plus{background:var(--soft);display:grid;place-items:center;color:var(--brand);box-shadow:none}.type.plus svg{color:var(--brand)}
+.sech{display:flex;align-items:center;justify-content:space-between;gap:8px}.sech h3{margin-bottom:10px}.clr{border:0;background:none;color:var(--brand);font-weight:700;font-size:13px;min-height:32px}
+.item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;background:var(--sf);border:0;border-radius:14px;padding:10px 12px;margin-bottom:8px;text-align:left;box-shadow:var(--sh);color:var(--ink)}
+.sq{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff}.sq.s0{background:var(--t0)}.sq.s1{background:var(--t1)}.sq.s2{background:var(--t2)}.sq.s3{background:var(--t3)}
+.it{display:grid;min-width:0}.it b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.it .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:#12B76A}.dot.p-High{background:#F04438}.dot.p-Medium{background:#F79009}
+.ir{display:grid;justify-items:end;gap:4px;font-size:12.5px}
+.sub{color:var(--mute);font-size:13px;font-weight:500}.late{color:var(--hit);font-weight:700}
+.pill,.tag{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;background:var(--lo);color:var(--lot)}
+.pill.s0{background:#E9E6FF;color:#4B3FD6}.pill.s1{background:#D2F3F6;color:#007A87}.pill.s2{background:#FBE0EC;color:#B83B73}.pill.s3{background:#DCE9FF;color:#1F55B5}
+@media (prefers-color-scheme:dark){.pill.s0{background:#2A2560;color:#B9B2FF}.pill.s1{background:#0B3A40;color:#7FE0EA}.pill.s2{background:#4A1F35;color:#FFA8CB}.pill.s3{background:#17305E;color:#9CC2FF}}
+.tag.High{background:var(--hi);color:var(--hit)}.tag.Medium{background:var(--md);color:var(--mdt)}.tag.Low{background:var(--ok);color:var(--okt)}
+.rp{background:var(--sf);border-radius:22px;padding:14px;margin-top:20px;box-shadow:var(--sh)}
+@media (min-width:900px){.rp{margin-top:0}}
+.rc{background:var(--soft);border-radius:16px;padding:14px;margin-top:12px}.rc:first-child{margin-top:0}.rc h4{margin:0 0 10px;font-size:14px;display:flex;justify-content:space-between;align-items:baseline}.rc h4 em{font-style:normal;color:var(--t1);font-size:13px}
+.add{display:grid;place-items:center;gap:8px;min-height:150px;width:100%;border:2px dashed var(--line);background:var(--soft);border-radius:18px;color:var(--ink);font-weight:800;text-align:center}.add svg{color:var(--brand)}
+.bar{height:8px;border-radius:9px;background:#C9DAF7;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--brand);border-radius:9px}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.mini div{background:var(--soft);border-radius:14px;padding:10px;text-align:center}.mini b{display:block;font-size:20px}.mini span{font-size:11.5px;color:var(--mute);font-weight:600}.mini .hot b{color:var(--hit)}
+.fold{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;border-radius:12px;padding:11px 12px;margin-bottom:8px;font-weight:700;font-size:13.5px;text-align:left;color:#0B2C66}.fold.c0{background:#C5E9EE}.fold.c1{background:#DAD8FF}.fold.c2{background:#F8D7E5}.fold.on{outline:3px solid var(--brand);outline-offset:1px}.fold span.n{font-weight:800}
+.lnk{display:block;border:0;background:none;padding:6px 0;text-align:left;font-weight:700;color:inherit;text-decoration:underline;min-height:36px}
+.alert{background:var(--soft);color:var(--brand);border-radius:14px;padding:12px 14px;margin:0 0 12px;font-weight:700}.alert.warn{background:var(--md);color:var(--mdt)}.alert b{display:block;margin-bottom:2px}
+.empty{text-align:center;color:var(--mute);padding:36px 0}
+.narrow{max-width:720px}
+.panel{background:var(--sf);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--sh)}.panel h4{margin:0 0 12px;font-size:16px;font-weight:800}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:12px;font-weight:700;color:var(--mute);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em}.f{margin-bottom:12px}
+.seg{display:flex;background:var(--lo);border-radius:14px;padding:4px;gap:4px;overflow-x:auto;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;min-height:42px;border:0;background:none;border-radius:11px;padding:8px 12px;font-weight:700;font-size:14px;color:var(--mute);white-space:nowrap}.seg button.on{background:var(--sf);color:var(--brand);box-shadow:var(--sh)}
+.hero{margin:6px 0 14px}.hero h2{font-size:27px;line-height:1.15;margin:8px 0 4px}
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--brand);font-weight:800;min-height:40px;padding:0}
+.task{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);min-height:50px}.task:last-of-type{border-bottom:0}
+.task input{width:22px;height:22px;accent-color:var(--brand)}.task.d span{text-decoration:line-through;color:var(--mute)}.task>span:not(.av){flex:1;min-width:0}
+.x{width:40px;height:40px;border:0;background:none;color:var(--mute);font-size:22px;border-radius:12px}
+.note{background:var(--soft);border-radius:14px;padding:10px 12px;margin:0 0 10px}.note p{margin:4px 0 0;white-space:pre-wrap}
+.addrow{display:flex;gap:8px;margin-top:12px}
+.ok{color:var(--okt);font-weight:700}a{color:var(--brand);font-weight:700}
+.auth{max-width:440px;margin:0 auto;padding:calc(40px + env(safe-area-inset-top,0px)) 18px 40px}.auth .mark{width:56px;height:56px;border-radius:18px;background:var(--side);color:#fff;display:grid;place-items:center;font-weight:800;font-size:24px;margin-bottom:16px}.auth h1{font-size:30px;margin-bottom:4px}.auth .sub{margin-bottom:20px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}button:active{transform:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><div class="empty">Loading…</div></div>
+<script>
+(function(){
+var API="https://mpwacnjzyalxpmdflhib.supabase.co/functions/v1/caseload-api";
+var ST=["Open","In progress","On hold","Closed"],PR=["High","Medium","Low"],TYPES=["Memo","Letter","Other"];
+var S={v:"auth",mode:"login",err:"",q:"",f:"Active",s:"All staff",t:"All",id:null,busy:false,info:""},ME=null,CASES=[],STAFF=[],BOT=null,TOK="",TMR=0;
+try{TOK=localStorage.getItem("caseload-token")||""}catch(e){}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function plus(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+function fd(s){return s?new Date(s+"T00:00:00").toLocaleDateString([],{month:"short",day:"numeric"}):"No due date"}
+function isMgr(){return ME&&ME.role==="manager"}
+function ini(n){return String(n||"?").trim().split(/\s+/).slice(0,2).map(function(w){return w[0]}).join("").toUpperCase()}
+function ic(p,z){z=z||20;return '<svg viewBox="0 0 24 24" width="'+z+'" height="'+z+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+var I={back:'<path d="M15 18l-6-6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',pause:'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',check:'<path d="M20 6L9 17l-5-5"/>',memo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',letter:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',other:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>'};
+var SI=[I.inbox,I.clock,I.pause,I.check],TI={Memo:I.memo,Letter:I.letter,Other:I.other};
+function info(){return S.info?'<div class="alert" id="info" role="status">'+esc(S.info)+'</div>':''}
+function call(action,data){
+  var h={"Content-Type":"application/json"};if(TOK)h["x-session"]=TOK;
+  return fetch(API,{method:"POST",headers:h,body:JSON.stringify(Object.assign({action:action},data||{}))}).then(function(r){return r.json().then(function(j){
+    if(r.status===401&&action!=="login"&&action!=="signup"){out();throw new Error("auth")}
+    if(!r.ok)throw new Error(j.error||"Something went wrong.");return j})},function(){throw new Error("Cannot reach the server. Check your internet.")})}
+function out(){TOK="";ME=null;try{localStorage.removeItem("caseload-token")}catch(e){}S.v="auth";S.err="";S.info="";draw()}
+function sel(id,arr,v,dis,fld){return '<select class="in" id="'+id+'"'+(fld?' data-fld="'+fld+'"':'')+(dis?' disabled':'')+'>'+arr.map(function(o){return'<option'+(o===v?' selected':'')+'>'+o+'</option>'}).join('')+'</select>'}
+function get(id){return CASES.filter(function(c){return c.id===id})[0]}
+function late(c){return c.status!=="Closed"&&c.due&&c.due<iso(new Date())}
+function load(){return call("cases").then(function(j){CASES=j.cases;if(isMgr())return call("staff_list").then(function(k){STAFF=k.staff})})}
+function boot(){
+  if(!TOK){draw();return}
+  call("me").then(function(j){ME=j.user;return load()}).then(function(){S.v="list";draw()}).catch(function(e){if(e.message!=="auth"){S.v="auth";S.err=e.message;draw()}})}
+function authV(){var su=S.mode==="signup";
+  return '<div class="auth"><div class="mark">C</div><h1>Caseload</h1><div class="sub">Manage cases, staff and documents in one place.</div><div class="panel"><div class="seg" style="margin-bottom:16px"><button class="'+(su?'':'on')+'" data-mode="login">Log in</button><button class="'+(su?'on':'')+'" data-mode="signup">Sign up</button></div>'+
+  (su?'<div class="f"><label for="an">Your name</label><input class="in" id="an" autocomplete="name"></div>':'')+
+  '<div class="f"><label for="am">Mobile number</label><input class="in" id="am" inputmode="tel" autocomplete="tel" placeholder="e.g. 7771234"></div>'+
+  '<div class="f"><label for="ar">Record card number'+(su?' (staff)':' (staff only)')+'</label><input class="in" id="ar" autocomplete="off"></div>'+
+  '<div class="f"><label for="ap">Password</label><input class="in" id="ap" type="password" autocomplete="'+(su?'new-password':'current-password')+'"></div>'+
+  (su?'<div class="f"><label for="ac">Confirm password</label><input class="in" id="ac" type="password" autocomplete="new-password"></div>':'')+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+(S.info?'<div class="ok" style="margin-bottom:12px" role="status">'+esc(S.info)+'</div>':'')+
+  '<button class="btn full" data-go="1"'+(S.busy?' disabled':'')+'>'+(S.busy?'Please wait…':su?'Create account':'Log in')+'</button>'+(su?'':'<button class="lnk" data-mode="reset" style="margin:14px auto 0;text-align:center">Forgot password?</button>')+
+  '<p class="sub" style="margin:14px 0 0">'+(su?'The first account is the manager. Staff can sign up only after the manager registers their record card number.':'Staff must also enter their record card number.')+'</p></div></div>'}
+function resetV(){return '<div class="auth"><div class="mark">C</div><h1>Reset password</h1><div class="sub">Get a code on your Telegram, or ask the manager for a reset code.</div><div class="panel">'+
+  '<div class="f"><label for="am">Mobile number</label><input class="in" id="am" inputmode="tel" autocomplete="tel"></div>'+
+  '<button class="btn alt full" data-rreq="1" style="margin-bottom:16px">Send code to my Telegram</button>'+
+  '<div class="f"><label for="ar">Record card number (staff only)</label><input class="in" id="ar" autocomplete="off"></div>'+
+  '<div class="f"><label for="rc">Reset code</label><input class="in" id="rc" autocomplete="off" autocapitalize="characters"></div>'+
+  '<div class="f"><label for="ap">New password</label><input class="in" id="ap" type="password" autocomplete="new-password"></div>'+
+  '<div class="f"><label for="ac">Confirm new password</label><input class="in" id="ac" type="password" autocomplete="new-password"></div>'+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+(S.info?'<div class="ok" style="margin-bottom:12px" role="status">'+esc(S.info)+'</div>':'')+
+  '<button class="btn full" data-rdo="1"'+(S.busy?' disabled':'')+'>Reset password</button><button class="lnk" data-mode="login" style="margin:14px auto 0;text-align:center">Back to log in</button></div></div>'}
+function fsz(b){return b<1048576?Math.max(1,Math.round(b/1024))+" KB":(b/1048576).toFixed(1)+" MB"}
+function shrink(f){return new Promise(function(res){if(f.type==="application/pdf"||f.type==="image/gif"||f.size<700000)return res(f);var im=new Image(),u=URL.createObjectURL(f);im.onload=function(){var k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);c.toBlob(function(b){URL.revokeObjectURL(u);res(b&&b.size<f.size?new File([b],f.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}):f)},"image/jpeg",.82)};im.onerror=function(){URL.revokeObjectURL(u);res(f)};im.src=u})}
+function sendFile(cid,f){return shrink(f).then(function(g){if(g.size>5242880)throw new Error(f.name+" is larger than 5 MB.");if(["application/pdf","image/jpeg","image/png","image/webp","image/gif"].indexOf(g.type)<0)throw new Error(f.name+": only PDF or image files can be added.");return fetch(API,{method:"POST",headers:{"x-session":TOK,"x-upload":"1","x-case":cid,"x-filename":encodeURIComponent(g.name),"Content-Type":g.type},body:g}).then(function(r){return r.json().then(function(j){if(r.status===401){out();throw new Error("auth")}if(!r.ok)throw new Error(j.error||"Upload failed.");return j})})})}
+function upload(fl){var c=get(S.id),list=[].slice.call(fl),n=$("dn"),errs=[],chain=Promise.resolve();if(n)n.textContent="Uploading…";list.forEach(function(f){chain=chain.then(function(){return sendFile(c.id,f)}).catch(function(e){if(e.message!=="auth")errs.push(e.message)})});chain.then(function(){return load()}).then(function(){S.info=errs.length?errs.join(" "):"Documents added.";draw()}).catch(function(){})}
+function shell(inner,act){var mg=isMgr();
+  var tabs=[['list','Cases',I.folder,'data-back="1"']].concat(mg?[['new','New',I.plus,'data-new="1"'],['staff','Staff',I.users,'data-staff="1"']]:[]);
+  return '<div class="shell"><aside class="side"><div class="me"><span class="av xl">'+esc(ini(ME.name))+'</span><b>'+esc(ME.name)+'</b><small>'+(mg?'Manager':'Staff')+'</small></div>'+
+  [tabs[0]].concat(mg?[tabs[2]]:[]).map(function(t){return'<button class="nv'+(act===t[0]?' on':'')+'" '+t[3]+'>'+ic(t[2])+t[1]+'</button>'}).join('')+
+  (ME.telegram?'':'<button class="nv" data-tglink="1">'+ic(I.send)+'Connect Telegram</button>')+
+  '<div class="grow"></div><button class="nv" data-logout="1">'+ic(I.out)+'Log out</button></aside><main class="main"><div class="mtop"><span class="av">'+esc(ini(ME.name))+'</span><b>Caseload</b><span class="grow"></span><span class="tag">'+(mg?'Manager':'Staff')+'</span></div>'+inner+'</main>'+
+  '<nav class="tabbar" aria-label="Main">'+tabs.map(function(t){return'<button class="'+(act===t[0]?'on':'')+'" '+t[3]+'>'+ic(t[2],22)+t[1]+'</button>'}).join('')+'<button data-logout="1">'+ic(I.out,22)+'Log out</button></nav></div>'}
+function match(c){var q=S.q.toLowerCase();
+  if(q&&(c.client+" "+c.id+" "+c.type).toLowerCase().indexOf(q)<0)return false;
+  if(S.t!=="All"&&c.type!==S.t)return false;
+  if(S.s!=="All staff"&&(S.s==="Unassigned"?c.staff_name:c.staff_name!==S.s))return false;
+  return S.f==="All"||(S.f==="Active"?c.status!=="Closed":c.status===S.f)}
+function rows(){return CASES.filter(match).sort(function(a,b){if((a.status==="Closed")!==(b.status==="Closed"))return a.status==="Closed"?1:-1;return (a.due||"9999").localeCompare(b.due||"9999")})}
+function items(r){
+  if(!r.length)return '<div class="empty">'+(isMgr()?'No cases match.<br>Tap “Add new case” to start one.':'No cases are assigned to you yet.')+'</div>';
+  return r.map(function(c){var dn=c.tasks.filter(function(x){return x.done}).length,si=ST.indexOf(c.status),lt=late(c);
+    return '<button class="item" data-open="'+c.id+'"><span class="sq s'+si+'">'+ic(TI[c.type]||I.other)+'</span><span class="it"><b><i class="dot p-'+c.pri+'"></i>'+esc(c.client)+'</b><span class="sub">'+c.id+' · '+esc(c.type)+(c.staff_name?' · '+esc(c.staff_name):'')+(c.tasks.length?' · '+dn+'/'+c.tasks.length+' tasks':'')+'</span></span><span class="ir"><span class="'+(lt?'late':'sub')+'">'+(lt?'Overdue · ':'')+fd(c.due)+'</span><span class="pill s'+si+'">'+c.status+'</span></span></button>'}).join('')}
+function rpanel(){
+  var vis=CASES.filter(function(c){return S.s==="All staff"||(S.s==="Unassigned"?!c.staff_name:c.staff_name===S.s)}),open=vis.filter(function(c){return c.status!=="Closed"}),t=iso(new Date()),n1=plus(1),w=plus(7);
+  var hi=open.filter(function(c){return c.pri==="High"}).length,ov=open.filter(late).length,wk=open.filter(function(c){return c.due&&c.due>=t&&c.due<=w}).length;
+  var pct=vis.length?Math.round((vis.length-open.length)*100/vis.length):0;
+  var rem=function(l,f){return open.filter(f).map(function(c){return'<button class="lnk" data-open="'+c.id+'">'+l+' · '+esc(c.client)+' ('+c.id+')</button>'}).join('')};
+  var rh=rem("Due tomorrow",function(c){return c.due===n1})+rem("Due today",function(c){return c.due===t})+rem("Overdue",late);
+  var names={};CASES.forEach(function(c){if(c.staff_name)names[c.staff_name]=(names[c.staff_name]||0)+(c.status!=="Closed"?1:0)});
+  var nl=Object.keys(names);
+  return '<aside class="rp"><div class="rc">'+(isMgr()?'<button class="add" data-new="1">'+ic(I.upload,40)+'Add new case</button>':'<div style="text-align:center;padding:10px 0"><div style="font-size:34px;font-weight:800">'+open.length+'</div><div class="sub">Open cases assigned to you</div></div>')+'</div>'+
+  '<div class="rc"><h4>Case progress <em>'+(100-pct)+'% left</em></h4><div class="sub">'+(vis.length-open.length)+' of '+vis.length+' cases are closed</div><div class="bar"><i style="width:'+pct+'%"></i></div></div>'+
+  '<div class="mini"><div class="'+(hi?'hot':'')+'"><b>'+hi+'</b><span>High priority</span></div><div class="'+(ov?'hot':'')+'"><b>'+ov+'</b><span>Overdue</span></div><div><b>'+wk+'</b><span>Due in 7 days</span></div></div>'+
+  (rh?'<div class="rc"><h4>Reminders</h4>'+rh+'</div>':'')+
+  (isMgr()?'<div class="rc"><h4>Your team</h4>'+(nl.length?nl.map(function(k,i){return'<button class="fold c'+(i%3)+(S.s===k?' on':'')+'" data-sf="'+esc(k)+'"><span>'+esc(k)+'</span><span class="n">'+names[k]+' open</span></button>'}).join(''):'<div class="sub">No cases assigned yet.</div>')+'<button class="btn alt full sm" data-staff="1">+ Add or manage staff</button></div>':'')+
+  (ME.telegram?'':'<div class="rc"><button class="btn alt full" data-tglink="1">'+ic(I.send)+'Connect Telegram</button></div>')+'</aside>'}
+function listV(){
+  var vis=CASES.filter(function(c){return S.s==="All staff"||(S.s==="Unassigned"?!c.staff_name:c.staff_name===S.s)});
+  var cnt=ST.map(function(s){return vis.filter(function(c){return c.status===s}).length});
+  var tiles=ST.map(function(s,i){return'<button class="tile t'+i+(S.f===s?' on':'')+'" data-f="'+s+'"><span class="ico">'+ic(SI[i])+'</span><span><b>'+s+'</b><small>'+cnt[i]+' case'+(cnt[i]===1?'':'s')+'</small></span></button>'}).join('');
+  var types=TYPES.map(function(k,i){var n=vis.filter(function(c){return c.type===k}).length;return'<button class="type k'+i+(S.t===k?' on':'')+'" data-tp="'+k+'">'+ic(TI[k],24)+'<span><b>'+k+'</b><small>'+n+' case'+(n===1?'':'s')+'</small></span></button>'}).join('')+(isMgr()?'<button class="type plus" data-new="1" aria-label="New case">'+ic(I.plus,26)+'</button>':'');
+  var filt=S.f!=="Active"||S.t!=="All"||S.s!=="All staff"||S.q;
+  return shell('<div class="cols"><section>'+info()+'<div class="search">'+ic(I.search)+'<input class="in" id="q" type="search" placeholder="Search client, ID or type" value="'+esc(S.q)+'"></div>'+
+    '<h3>Status</h3><div class="tiles">'+tiles+'</div><h3>Types</h3><div class="types">'+types+'</div>'+
+    '<div class="sech" style="margin-top:20px"><h3 style="margin:0 0 10px">'+(S.f==="Active"?'Active cases':S.f==="All"?'All cases':S.f)+'</h3>'+(filt?'<button class="clr" data-clear="1">Clear filters</button>':'')+'</div><div id="cl">'+items(rows())+'</div></section>'+rpanel()+'</div>','list')}
+function staffSel(id,v){return '<select class="in" id="'+id+'"><option value="">Unassigned</option>'+STAFF.map(function(s){return'<option value="'+s.id+'"'+(s.id===v?' selected':'')+'>'+esc(s.name)+'</option>'}).join('')+'</select>'}
+function newV(){
+  return shell('<div class="narrow"><button class="back" data-back="1">'+ic(I.back)+'Cases</button><div class="hero"><h2>New case</h2></div><div class="panel"><div class="f"><label for="nc">Client name</label><input class="in" id="nc" autocomplete="off"></div>'+
+  '<div class="grid2"><div class="f"><label for="nt">Type</label>'+sel("nt",TYPES,"Memo")+'</div><div class="f"><label for="nr">Priority</label>'+sel("nr",PR,"Medium")+'</div></div><div class="f"><label for="nd">Due date</label><input class="in" type="date" id="nd" value="'+plus(7)+'"></div>'+
+  '<div class="f"><label for="na">Assigned to</label>'+staffSel("na","")+'</div><div class="f"><label for="ns">Summary</label><textarea class="in" id="ns" rows="3"></textarea></div>'+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+'<button class="btn full" data-create="1"'+(S.busy?' disabled':'')+'>Create case</button></div></div>','new')}
+function caseV(c){var m=isMgr();
+  return shell('<div class="narrow"><button class="back" data-back="1">'+ic(I.back)+'Cases</button>'+info()+'<div class="hero"><span class="tag '+c.pri+'">'+c.pri+' priority</span> <span class="tag">'+esc(c.id)+'</span><h2>'+esc(c.client)+'</h2><div class="sub">'+esc(c.type)+(c.summary?' · '+esc(c.summary):'')+'</div></div>'+
+  '<div class="panel"><label>Status</label><div class="seg" role="group" aria-label="Status">'+ST.map(function(s){return'<button class="'+(s===c.status?'on':'')+'" data-st="'+s+'">'+s+'</button>'}).join('')+'</div></div>'+
+  '<div class="panel"><div class="grid2"><div class="f"><label for="fp">Priority</label>'+sel("fp",PR,c.pri,!m,"pri")+'</div><div class="f"><label for="fdv">Due</label><input class="in" type="date" id="fdv" data-fld="due" value="'+esc(c.due||"")+'"'+(m?'':' disabled')+'></div></div>'+
+  '<div class="f" style="margin-bottom:0"><label for="fa">Assigned to</label>'+(m?staffSel("fa",c.staff_id).replace('<select class="in" id="fa"','<select class="in" id="fa" data-fld="staff_id"'):'<div>'+esc(c.staff_name||"Unassigned")+'</div>')+'</div></div>'+
+  '<div class="panel"><h4>Documents</h4>'+((c.docs||[]).length?c.docs.map(function(x){return'<div class="task"><span>'+(x.mime==="application/pdf"?'PDF':'Image')+' · '+esc(x.name)+'<div class="sub">'+fsz(x.size)+'</div></span><button class="btn alt sm" data-doc="'+x.id+'">Open</button>'+(m?'<button class="x" data-rdoc="'+x.id+'" aria-label="Remove document">×</button>':'')+'</div>'}).join(''):'<div class="sub">No documents yet.</div>')+(m?'<label class="btn alt full" for="fu" style="margin-top:12px;text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink)">+ Add PDF or image</label><input type="file" id="fu" accept="application/pdf,image/*" multiple hidden><div class="sub" id="dn" style="margin-top:8px">PDF or image, up to 5 MB each.</div>':'')+'</div>'+
+  '<div class="panel"><h4>Tasks</h4>'+(c.tasks.length?c.tasks.map(function(t){return'<div class="task'+(t.done?' d':'')+'"><input type="checkbox" data-tt="'+t.id+'" aria-label="Done"'+(t.done?' checked':'')+(m?'':' disabled')+'><span>'+esc(t.text)+'</span>'+(m?'<button class="x" data-rt="'+t.id+'" aria-label="Remove task">×</button>':'')+'</div>'}).join(''):'<div class="sub">No tasks yet.</div>')+(m?'<div class="addrow"><input class="in" id="nt2" placeholder="Add a task"><button class="btn" data-addtask="1">Add</button></div>':'')+'</div>'+
+  '<div class="panel"><h4>Case notes</h4>'+(m?'<textarea class="in" id="nn" rows="3" placeholder="Write a note about contact, decisions or next steps"></textarea><button class="btn full" data-addnote="1" style="margin:10px 0 16px">Save note</button>':'')+(c.notes.length?c.notes.map(function(n){return'<div class="note"><div class="sub">'+esc(n.author||"")+' · '+new Date(n.ts).toLocaleString([],{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})+'</div><p>'+esc(n.text)+'</p></div>'}).join(''):'<div class="sub">No notes yet.</div>')+'</div>'+
+  (m?'<button class="btn warn full" data-del="1">'+(S.del?'Tap again to delete this case':'Delete case')+'</button>':'')+'</div>','list')}
+function staffV(){
+  return shell('<div class="narrow"><button class="back" data-back="1">'+ic(I.back)+'Cases</button><div class="hero"><h2>Staff</h2></div>'+info()+
+  '<div class="panel"><h4>Telegram bot</h4>'+(BOT?'<p style="margin:0 0 6px" class="ok">Connected: @'+esc(BOT)+'</p><div class="sub">Everyone taps “Connect Telegram” to receive updates.</div>':'<div class="sub" style="margin-bottom:12px">Create a bot with @BotFather in Telegram, then paste its token here. The token is stored on the server only.</div><div class="f"><label for="bt">Bot token</label><input class="in" id="bt" type="password" autocomplete="off"></div><button class="btn full" data-bot="1"'+(S.busy?' disabled':'')+'>Connect bot</button>')+'</div>'+
+  '<div class="panel"><h4>Register staff</h4><div class="sub" style="margin-bottom:12px">Staff sign up and log in with their record card number. If you leave the mobile blank it is linked when they sign up.</div><div class="f"><label for="sn">Name</label><input class="in" id="sn" autocomplete="off"></div><div class="f"><label for="sm">Mobile number (optional)</label><input class="in" id="sm" inputmode="tel"></div><div class="f"><label for="sc">Record card number</label><input class="in" id="sc" autocomplete="off"></div>'+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+'<button class="btn full" data-addstf="1">Add staff</button></div>'+
+  '<div class="panel"><h4>Registered staff</h4>'+(STAFF.length?STAFF.map(function(x){return'<div class="task"><span class="av">'+esc(ini(x.name))+'</span><span>'+esc(x.name)+'<div class="sub">'+(x.mobile?esc(x.mobile):'Not signed up yet')+' · Card '+esc(x.card)+(x.telegram?' · Telegram connected':'')+'</div></span>'+(x.signed_up?'<button class="btn alt sm" data-rissue="'+x.id+'">Reset code</button>':'')+'<button class="x" data-rmstf="'+x.id+'" aria-label="Remove staff">×</button></div>'}).join(''):'<div class="sub">No staff registered yet.</div>')+'</div></div>','staff')}
+function draw(){var a=$("app");
+  if(!ME||S.v==="auth")a.innerHTML=S.mode==="reset"?resetV():authV();
+  else if(S.v==="staff"&&isMgr())a.innerHTML=staffV();
+  else if(S.v==="new"&&isMgr())a.innerHTML=newV();
+  else if(S.v==="case"&&get(S.id))a.innerHTML=caseV(get(S.id));
+  else{S.v="list";a.innerHTML=listV()}
+  clearTimeout(TMR);if(S.info&&$("info")&&S.info.indexOf("Reset code")!==0)TMR=setTimeout(function(){S.info="";var e=$("info");if(e)e.remove()},5000)}
+function run(p,done){S.busy=true;S.err="";draw();return p.then(function(r){S.busy=false;if(done)return done(r)}).catch(function(e){S.busy=false;if(e.message!=="auth"){S.err=e.message}draw()})}
+function reload(msg){return load().then(function(){S.info=msg||"";draw()}).catch(function(e){if(e.message!=="auth"){S.err=e.message;draw()}})}
+function act(p,msg){return p.then(function(){return reload(msg)}).catch(function(e){if(e.message!=="auth"){S.info=e.message;draw()}})}
+function enter(j){TOK=j.token;ME=j.user;try{localStorage.setItem("caseload-token",TOK)}catch(e){}return load().then(function(){S.v="list";S.err="";S.info="";draw()})}
+$("app").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;var d=b.dataset,c=get(S.id);
+  if(d.mode){S.mode=d.mode;S.err="";S.info="";draw()}
+  else if(d.rreq){var rm=$("am").value;if(!rm.trim()){S.err="Enter your mobile number first.";draw();return}call("reset_request",{mobile:rm}).then(function(){S.err="";S.info="If your account has Telegram connected, a code was sent there.";draw();$("am").value=rm}).catch(function(er){S.err=er.message;draw()})}
+  else if(d.rdo){var m2=$("am").value,cd=$("ar").value,code=$("rc").value,p1=$("ap").value;if(p1!==$("ac").value){S.err="Passwords do not match.";S.info="";draw();return}run(call("reset_do",{mobile:m2,card:cd,code:code,password:p1}),function(){S.mode="login";S.err="";S.info="Password changed. Log in with your new password.";draw()})}
+  else if(d.go){var su=S.mode==="signup",m=$("am").value,pw=$("ap").value,card=$("ar").value;
+    if(su&&pw!==$("ac").value){S.err="Passwords do not match.";draw();return}
+    run(call(su?"signup":"login",{name:su?$("an").value:"",mobile:m,password:pw,card:card}),enter)}
+  else if(d.logout){call("logout").catch(function(){});out()}
+  else if(d.f){S.f=S.f===d.f?"Active":d.f;draw()}
+  else if(d.tp){S.t=S.t===d.tp?"All":d.tp;draw()}
+  else if(d.sf){S.s=S.s===d.sf?"All staff":d.sf;draw()}
+  else if(d.clear){S.f="Active";S.t="All";S.s="All staff";S.q="";draw()}
+  else if(d.st){act(call("case_update",{id:c.id,fields:{status:d.st}}),"Status updated.")}
+  else if(d.open){S.v="case";S.id=d.open;S.del=false;S.info="";draw();window.scrollTo(0,0)}
+  else if(d.back){S.v="list";S.err="";S.info="";S.del=false;draw();window.scrollTo(0,0)}
+  else if(d.new){S.v="new";S.err="";draw();window.scrollTo(0,0)}
+  else if(d.staff){S.v="staff";S.err="";S.info="";call("bot_status").then(function(j){BOT=j.username}).catch(function(){}).then(draw);window.scrollTo(0,0)}
+  else if(d.create){var n=$("nc").value.trim();if(!n){$("nc").focus();return}
+    run(call("case_create",{client:n,type:$("nt").value,pri:$("nr").value,due:$("nd").value,summary:$("ns").value,staff_id:$("na").value}),function(r){return load().then(function(){S.v="case";S.id=r.id;S.info="Case opened. The assigned staff and manager were notified on Telegram if connected.";draw();window.scrollTo(0,0)})})}
+  else if(d.addtask){var t=$("nt2").value.trim();if(t)act(call("task_add",{id:c.id,text:t}))}
+  else if(d.rt){act(call("task_remove",{task:+d.rt}))}
+  else if(d.addnote){var x=$("nn").value.trim();if(x)act(call("note_add",{id:c.id,text:x}))}
+  else if(d.del){if(!S.del){S.del=true;draw()}else call("case_delete",{id:c.id}).then(function(){S.v="list";S.del=false;return reload()}).catch(function(){})}
+  else if(d.addstf){S.err="";call("staff_add",{name:$("sn").value,mobile:$("sm").value,card:$("sc").value}).then(function(){return load()}).then(draw).catch(function(er){if(er.message!=="auth"){S.err=er.message;draw()}})}
+  else if(d.rmstf){call("staff_remove",{id:d.rmstf}).then(load).then(draw).catch(function(){})}
+  else if(d.doc){var w=window.open("","_blank");call("doc_url",{id:+d.doc}).then(function(r){if(w)w.location=r.url;else location.href=r.url}).catch(function(er){if(w)w.close();S.info=er.message;draw()})}
+  else if(d.rdoc){act(call("doc_remove",{id:+d.rdoc}),"Document removed.")}
+  else if(d.rissue){call("reset_issue",{id:d.rissue}).then(function(r){S.info="Reset code: "+r.code+" (valid 24 hours). Give it to the staff member.";draw()}).catch(function(er){S.info=er.message;draw()})}
+  else if(d.bot){var tk=$("bt").value;run(call("bot_setup",{token:tk}),function(r){BOT=r.username;draw()})}
+  else if(d.tglink){call("tg_link").then(function(r){window.open(r.url,"_blank","noopener");S.info="Telegram opened. Tap Start in the bot chat, then come back here.";draw()}).catch(function(er){S.info=er.message;draw()})}
+});
+$("app").addEventListener("change",function(e){var t=e.target,c=get(S.id);
+  if(t.dataset.tt)act(call("task_toggle",{task:+t.dataset.tt,done:t.checked}));
+  else if(t.dataset.fld){var f={};f[t.dataset.fld]=t.value;act(call("case_update",{id:c.id,fields:f}),"Saved.")}
+  else if(t.id==="fu"){upload(t.files)}
+});
+$("app").addEventListener("input",function(e){if(e.target.id==="q"){S.q=e.target.value;$("cl").innerHTML=items(rows())}});
+$("app").addEventListener("keydown",function(e){if(e.key==="Enter"&&S.v==="auth"&&e.target.tagName==="INPUT"){var g=document.querySelector("[data-go]");if(g)g.click()}});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&ME&&S.v==="list")call("me").then(function(j){ME=j.user;return load()}).then(draw).catch(function(){})});
+boot();
+})();
+</script>
+</body>
+</html>
