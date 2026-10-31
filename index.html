@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ECECE6">
+<title>Caseload – case manager</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#ECECE6;--sf:#fff;--ink:#14181B;--mute:#7A7F85;--line:#E8E8E2;--soft:#F6F6F2;--pri:#7C4DF2;--pi:#fff;--track:#E6E0FA;--green:#0E9F6E;--hi:#FDE4E1;--hit:#B42318;--md:#FFF0CC;--mdt:#8A5A00;--ok:#D8F3E5;--okt:#0B6B3E;--vi:#EEE8FF;--vit:#5B35D6;--sh:0 1px 2px rgba(20,24,27,.04);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#111215;--sf:#1B1D22;--ink:#F2F3F5;--mute:#9298A1;--line:#2B2E35;--soft:#23262C;--pri:#A184FF;--pi:#14102A;--track:#34305A;--green:#4ADE9B;--hi:#3A1D1B;--hit:#FDA29B;--md:#3A2F10;--mdt:#FEC84B;--ok:#10362A;--okt:#6CE9A6;--vi:#2A2347;--vit:#C4B2FF;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:500;letter-spacing:-.015em}h3{font-size:22px}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;touch-action:manipulation}
+button:active:not(:disabled){transform:scale(.98)}
+:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+svg{flex:0 0 auto}
+.page{max-width:1180px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(36px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:720px;margin:0 auto}
+.dash{display:flex;flex-direction:column;gap:16px}.col{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}
+@media (min-width:960px){.dash{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}.col{display:flex;flex-direction:column;gap:20px}}
+.cd{background:var(--sf);border-radius:28px;padding:22px;box-shadow:var(--sh)}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.sub{color:var(--mute);font-size:13px}.sub.big{font-size:17px}
+.ib{width:48px;height:48px;border-radius:16px;border:1px solid var(--line);background:var(--sf);display:grid;place-items:center;color:var(--ink)}.ib.sm{width:38px;height:38px;border-radius:12px;font-size:18px}
+.btn{min-height:48px;border:1px solid transparent;border-radius:14px;background:var(--pri);color:var(--pi);font-weight:500;padding:12px 20px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn.alt{background:var(--sf);color:var(--ink);border-color:var(--line)}.btn.warn{background:var(--hi);color:var(--hit)}.btn.sm{min-height:38px;padding:7px 14px;font-size:14px;border-radius:12px}.btn:disabled{opacity:.5}.btn.full{width:100%}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.ava{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:500;color:#fff;background:linear-gradient(135deg,#9B7BFF,#5B35D6)}
+.cd h2{font-size:30px;line-height:1.1}
+.oc{display:inline-block;border:1px solid var(--line);border-radius:14px;padding:9px 14px;font-size:14px}
+.ocs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.av{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;font-size:12px;font-weight:600;color:#14181B;flex:0 0 auto}
+.stack{display:flex}.stack .av{border:2px solid var(--sf);margin-left:-10px}.stack .av:first-child{margin-left:0}
+.ring{color:var(--ink)}
+.pg{display:flex;flex-direction:column;gap:10px}.pg h2{margin-top:6px}.pg p{margin:0;color:var(--mute);font-size:14px}
+.search{position:relative;margin-bottom:12px}.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mute)}.search .in{padding-left:42px;border-radius:999px;background:var(--soft);border-color:transparent}
+.in{width:100%;min-height:48px;border:1px solid var(--line);background:var(--sf);border-radius:14px;padding:11px 14px;min-width:0;font-size:16px}
+textarea.in{min-height:92px;resize:vertical}select.in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 20px) 55%,calc(100% - 15px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}.in:disabled{opacity:.6}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--sf);border-radius:14px;padding:8px 14px;font-size:14px}.chip.on{background:var(--pri);border-color:var(--pri);color:var(--pi)}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--sf);border:1px solid var(--line);border-radius:20px;padding:10px 12px;margin-bottom:10px}
+.ci{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.ci.s0{background:var(--vi);color:var(--vit)}.ci.s1{background:var(--md);color:var(--mdt)}.ci.s2{background:var(--lo,#ECEFF3);color:var(--mute)}.ci.s3{background:var(--ok);color:var(--okt)}
+.rt{display:grid;min-width:0;flex:1}.rt b{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rt .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rr{display:flex;align-items:center;gap:8px}
+.late{color:var(--hit);font-weight:500}
+.tag{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;background:var(--soft);color:var(--mute)}
+.tag.High{background:var(--hi);color:var(--hit)}.tag.Medium{background:var(--md);color:var(--mdt)}.tag.Low{background:var(--ok);color:var(--okt)}.tag.pri{background:var(--vi);color:var(--vit)}
+.badge{background:var(--pri);color:var(--pi);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.empty{text-align:center;color:var(--mute);padding:28px 0}
+.nrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.nrow:last-of-type{border-bottom:0}
+.ft{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.cal .chead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.cal .chead b{font-size:20px;font-weight:500}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.dow{font-size:13px;padding:8px 0;color:var(--ink)}
+.d{position:relative;border:0;background:none;height:42px;border-radius:12px;font-size:14px}.d.o{color:var(--mute);opacity:.5}.d.t{color:var(--green);font-weight:600}.d.sel{background:var(--pri);color:var(--pi);font-weight:600}
+.d i{position:absolute;left:50%;bottom:5px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--pri)}.d.sel i{background:var(--pi)}
+.sw{width:52px;height:30px;border-radius:999px;border:0;background:var(--line);position:relative;flex:0 0 auto;transition:background .2s}.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}.sw.on{background:var(--pri)}.sw.on i{transform:translateX(22px)}
+.ig{display:flex;align-items:center;gap:12px;padding:12px 0}.ig .ci{background:var(--soft);color:var(--ink)}
+.due3{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}.due3 b{font-size:20px;font-weight:500;display:block;margin-top:2px}
+.alert{background:var(--vi);color:var(--vit);border-radius:16px;padding:12px 14px;margin:0 0 14px;font-weight:500}
+.lnk{display:block;border:0;background:none;padding:6px 0;text-align:left;font-weight:500;color:var(--pri);text-decoration:underline;min-height:36px}
+.ok{color:var(--okt);font-weight:500}a{color:var(--pri);font-weight:500}
+.panel{background:var(--sf);border-radius:24px;padding:20px;margin-bottom:14px;box-shadow:var(--sh)}.panel h4{margin:0 0 12px;font-size:18px;font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:13px;color:var(--mute);margin:0 0 6px}.f{margin-bottom:12px}
+.seg{display:flex;background:var(--soft);border-radius:16px;padding:4px;gap:4px;overflow-x:auto;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;min-height:42px;border:0;background:none;border-radius:12px;padding:8px 14px;font-size:14px;color:var(--mute);white-space:nowrap}.seg button.on{background:var(--sf);color:var(--pri);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.hero{margin:16px 0}.hero h2{font-size:32px;line-height:1.1;margin:10px 0 6px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.task{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);min-height:50px}.task:last-of-type{border-bottom:0}
+.task input{width:22px;height:22px;accent-color:var(--pri)}.task.d span{text-decoration:line-through;color:var(--mute)}.task>span:not(.av){flex:1;min-width:0}
+.x{width:40px;height:40px;border:0;background:none;color:var(--mute);font-size:22px;border-radius:12px}
+.note{background:var(--soft);border-radius:16px;padding:12px 14px;margin:0 0 10px}.note p{margin:4px 0 0;white-space:pre-wrap}
+.addrow{display:flex;gap:8px;margin-top:12px}
+.auth{max-width:440px;margin:0 auto;padding:calc(40px + env(safe-area-inset-top,0px)) 16px 40px}.auth .mark{width:56px;height:56px;border-radius:18px;background:var(--pri);color:var(--pi);display:grid;place-items:center;font-weight:600;font-size:24px;margin-bottom:16px}.auth h1{font-size:32px;margin-bottom:4px}.auth .sub{margin-bottom:20px}
+body.side{background:#EAF1FD}
+.sidewrap{--bg:#EAF1FD;--sf:#fff;--ink:#0B2C66;--mute:#7388AB;--line:#DCE6F7;--soft:#F3F7FE;--pri:#2A6BD6;--pi:#fff;--track:#C9DAF7;--vi:#E3ECFF;--vit:#2A6BD6;--side:#05307A;--side2:#03246A;color:var(--ink)}
+@media (prefers-color-scheme:dark){body.side{background:#0A1428}.sidewrap{--bg:#0A1428;--sf:#121E3A;--ink:#E8EEFC;--mute:#8CA0C6;--line:#213056;--soft:#17254A;--pri:#6EA0FF;--pi:#0A1428;--track:#27406E;--vi:#1B2A55;--vit:#9CC2FF;--side:#06122B;--side2:#030B1C}}
+.sidewrap .shell{display:block;min-height:100vh}.sidewrap .side{display:none}
+.sidewrap .main{padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(100px + env(safe-area-inset-bottom,0px))}
+.sidewrap .main .page{padding:0;max-width:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:var(--sf);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button{flex:1;display:grid;justify-items:center;gap:2px;border:0;background:none;font-size:11px;font-weight:500;color:var(--mute);padding:6px 0;min-height:54px}.tabbar button.on{color:var(--pri)}
+.mtop{display:flex;align-items:center;gap:10px;margin-bottom:14px}.mtop b{font-size:18px;font-weight:600}.grow{flex:1}
+@media (min-width:900px){
+ body.side{padding:24px}
+ .sidewrap .shell{display:grid;grid-template-columns:240px 1fr;max-width:1240px;margin:0 auto;border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(11,44,102,.2);min-height:calc(100vh - 48px);background:var(--bg)}
+ .sidewrap .side{display:flex;flex-direction:column;background:var(--side);color:#fff;padding:28px 0}
+ .tabbar,.mtop{display:none}.sidewrap .main{padding:28px}
+ .cols{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
+}
+.me{display:grid;justify-items:center;gap:4px;padding:0 16px 26px}.me small{opacity:.7}.me b{font-size:15px;font-weight:600}
+.avx{width:62px;height:62px;border-radius:50%;background:#fff;color:#05307A;display:grid;place-items:center;font-size:20px;font-weight:600}
+.nv{display:flex;gap:12px;align-items:center;width:100%;border:0;background:none;color:#fff;padding:13px 28px;font-size:15px;font-weight:500;text-align:left;opacity:.9}.nv.on{background:var(--side2);opacity:1}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media (min-width:560px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{border:0;border-radius:18px;padding:14px;color:#fff;text-align:left;min-height:108px;display:flex;flex-direction:column;justify-content:space-between}
+.tile.t0{background:#6C5CFF}.tile.t1{background:#00A3B4}.tile.t2{background:#E26EA0}.tile.t3{background:#2A6BD6}
+.tile.on{outline:3px solid var(--ink);outline-offset:2px}.tile b{display:block;font-size:15px;font-weight:600}.tile small{opacity:.92;font-size:12.5px}
+.ico{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center}.tile.t0 .ico{color:#6C5CFF}.tile.t1 .ico{color:#00A3B4}.tile.t2 .ico{color:#E26EA0}.tile.t3 .ico{color:#2A6BD6}
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.type{border:0;background:var(--sf);border-radius:16px;padding:12px;text-align:left;min-height:92px;display:flex;flex-direction:column;justify-content:space-between;color:var(--ink)}
+.type svg{color:#6C5CFF}.type.k1 svg{color:#00A3B4}.type.k2 svg{color:#E26EA0}.type b{display:block;font-size:14px;font-weight:600}.type small{color:var(--mute);font-size:12px}.type.on{outline:3px solid var(--pri);outline-offset:2px}
+.type.plus{background:var(--soft);display:grid;place-items:center;color:var(--pri)}.type.plus svg{color:var(--pri)}
+.sech{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:20px}.sech h3{margin:0 0 10px;font-size:19px}.clr{border:0;background:none;color:var(--pri);font-weight:600;font-size:13px;min-height:32px}
+.sidewrap h3.sh{font-size:19px;margin:20px 0 10px}
+.sidewrap .ci{border-radius:12px;color:#fff}.sidewrap .ci.s0{background:#6C5CFF}.sidewrap .ci.s1{background:#00A3B4}.sidewrap .ci.s2{background:#E26EA0}.sidewrap .ci.s3{background:#2A6BD6}
+.sidewrap .row{border:0;box-shadow:0 2px 8px rgba(11,44,102,.07);border-radius:14px}
+.rp{background:var(--sf);border-radius:22px;padding:14px;margin-top:20px}@media (min-width:900px){.rp{margin-top:0}}
+.rc{background:var(--soft);border-radius:16px;padding:14px;margin-top:12px}.rc:first-child{margin-top:0}.rc h4{margin:0 0 10px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline}.rc h4 em{font-style:normal;color:#00A3B4;font-size:13px}
+.addbox{display:grid;place-items:center;gap:8px;min-height:150px;width:100%;border:2px dashed var(--line);background:var(--sf);border-radius:18px;color:var(--ink);font-weight:600;text-align:center}.addbox svg{color:var(--pri)}
+.pbar{height:8px;border-radius:9px;background:var(--track);overflow:hidden;margin-top:8px}.pbar i{display:block;height:100%;background:var(--pri);border-radius:9px}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.mini div{background:var(--soft);border-radius:14px;padding:10px;text-align:center}.mini b{display:block;font-size:20px;font-weight:600}.mini span{font-size:11.5px;color:var(--mute)}.mini .hot b{color:var(--hit)}
+.fold{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;border-radius:12px;padding:11px 12px;margin-bottom:8px;font-weight:500;font-size:13.5px;text-align:left;color:#0B2C66}.fold.c0{background:#C5E9EE}.fold.c1{background:#DAD8FF}.fold.c2{background:#F8D7E5}.fold.on{outline:3px solid var(--pri);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}button:active{transform:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><div class="empty">Loading…</div></div>
+<script>
+(function(){
+var API="https://mpwacnjzyalxpmdflhib.supabase.co/functions/v1/caseload-api";
+var ST=["Open","In progress","On hold","Closed"],PR=["High","Medium","Low"],TYPES=["Memo","Letter","Other"];
+var NW=new Date(),S={v:"auth",mode:"login",err:"",q:"",f:"Active",s:"All staff",t:"All",day:"",cy:NW.getFullYear(),cm:NW.getMonth(),id:null,busy:false,info:""},ME=null,CASES=[],STAFF=[],BOT=null,TOK="",TMR=0,LAY="cards";
+try{TOK=localStorage.getItem("caseload-token")||"";LAY=localStorage.getItem("caseload-layout")==="side"?"side":"cards"}catch(e){}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function plus(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+function fd(s){return s?new Date(s+"T00:00:00").toLocaleDateString([],{month:"short",day:"numeric"}):"No due date"}
+function isMgr(){return ME&&ME.role==="manager"}
+function ini(n){return String(n||"?").trim().split(/\s+/).slice(0,2).map(function(w){return w[0]}).join("").toUpperCase()}
+var AC=["#E4DBFF","#D3F0E2","#FFE3D1","#D6E6FF","#FADDEA"];
+function av(n,z){var h=0,s=String(n||"");for(var i=0;i<s.length;i++)h+=s.charCodeAt(i);return '<span class="av" title="'+esc(n)+'" style="background:'+AC[h%5]+(z?';width:'+z+'px;height:'+z+'px;font-size:'+Math.round(z/3)+'px':'')+'">'+esc(ini(n))+'</span>'}
+function ic(p,z){z=z||20;return '<svg viewBox="0 0 24 24" width="'+z+'" height="'+z+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+var I={back:'<path d="M15 18l-6-6 6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',pause:'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',check:'<path d="M20 6L9 17l-5-5"/>',filter:'<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',layout:'<rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="8" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',memo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',letter:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',other:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>'};
+var TYI={Memo:I.memo,Letter:I.letter,Other:I.other};
+var SI=[I.inbox,I.clock,I.pause,I.check];
+function ring(p,z){var C=2*Math.PI*18;return '<svg class="ring" width="'+z+'" height="'+z+'" viewBox="0 0 44 44" role="img" aria-label="'+p+' percent"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--track)" stroke-width="4"/><circle cx="22" cy="22" r="18" fill="none" stroke="var(--pri)" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+(C*p/100).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 22 22)"/><text x="22" y="26" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor">'+p+'%</text></svg>'}
+function info(){return S.info?'<div class="alert" id="info" role="status">'+esc(S.info)+'</div>':''}
+function call(action,data){
+  var h={"Content-Type":"application/json"};if(TOK)h["x-session"]=TOK;
+  return fetch(API,{method:"POST",headers:h,body:JSON.stringify(Object.assign({action:action},data||{}))}).then(function(r){return r.json().then(function(j){
+    if(r.status===401&&action!=="login"&&action!=="signup"){out();throw new Error("auth")}
+    if(!r.ok)throw new Error(j.error||"Something went wrong.");return j})},function(){throw new Error("Cannot reach the server. Check your internet.")})}
+function out(){TOK="";ME=null;try{localStorage.removeItem("caseload-token")}catch(e){}S.v="auth";S.err="";S.info="";draw()}
+function sel(id,arr,v,dis,fld){return '<select class="in" id="'+id+'"'+(fld?' data-fld="'+fld+'"':'')+(dis?' disabled':'')+'>'+arr.map(function(o){return'<option'+(o===v?' selected':'')+'>'+o+'</option>'}).join('')+'</select>'}
+function get(id){return CASES.filter(function(c){return c.id===id})[0]}
+function late(c){return c.status!=="Closed"&&c.due&&c.due<iso(new Date())}
+function load(){return call("cases").then(function(j){CASES=j.cases;if(isMgr())return call("staff_list").then(function(k){STAFF=k.staff}).then(function(){return call("bot_status").then(function(b){BOT=b.username}).catch(function(){})})})}
+function boot(){
+  if(!TOK){draw();return}
+  call("me").then(function(j){ME=j.user;return load()}).then(function(){S.v="list";draw()}).catch(function(e){if(e.message!=="auth"){S.v="auth";S.err=e.message;draw()}})}
+function authV(){var su=S.mode==="signup";
+  return '<div class="auth"><div class="mark">C</div><h1>Caseload</h1><div class="sub">Manage cases, staff and documents in one place.</div><div class="panel"><div class="seg" style="margin-bottom:16px"><button class="'+(su?'':'on')+'" data-mode="login">Log in</button><button class="'+(su?'on':'')+'" data-mode="signup">Sign up</button></div>'+
+  (su?'<div class="f"><label for="an">Your name</label><input class="in" id="an" autocomplete="name"></div>':'')+
+  '<div class="f"><label for="am">Mobile number</label><input class="in" id="am" inputmode="tel" autocomplete="tel" placeholder="e.g. 7771234"></div>'+
+  '<div class="f"><label for="ar">Record card number'+(su?' (staff)':' (staff only)')+'</label><input class="in" id="ar" autocomplete="off"></div>'+
+  '<div class="f"><label for="ap">Password</label><input class="in" id="ap" type="password" autocomplete="'+(su?'new-password':'current-password')+'"></div>'+
+  (su?'<div class="f"><label for="ac">Confirm password</label><input class="in" id="ac" type="password" autocomplete="new-password"></div>':'')+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+(S.info?'<div class="ok" style="margin-bottom:12px" role="status">'+esc(S.info)+'</div>':'')+
+  '<button class="btn full" data-go="1"'+(S.busy?' disabled':'')+'>'+(S.busy?'Please wait…':su?'Create account':'Log in')+'</button>'+(su?'':'<button class="lnk" data-mode="reset" style="margin:14px auto 0;text-align:center">Forgot password?</button>')+
+  '<p class="sub" style="margin:14px 0 0">'+(su?'The first account is the manager. Staff can sign up only after the manager registers their record card number.':'Staff must also enter their record card number.')+'</p></div></div>'}
+function resetV(){return '<div class="auth"><div class="mark">C</div><h1>Reset password</h1><div class="sub">Get a code on your Telegram, or ask the manager for a reset code.</div><div class="panel">'+
+  '<div class="f"><label for="am">Mobile number</label><input class="in" id="am" inputmode="tel" autocomplete="tel"></div>'+
+  '<button class="btn alt full" data-rreq="1" style="margin-bottom:16px">Send code to my Telegram</button>'+
+  '<div class="f"><label for="ar">Record card number (staff only)</label><input class="in" id="ar" autocomplete="off"></div>'+
+  '<div class="f"><label for="rc">Reset code</label><input class="in" id="rc" autocomplete="off" autocapitalize="characters"></div>'+
+  '<div class="f"><label for="ap">New password</label><input class="in" id="ap" type="password" autocomplete="new-password"></div>'+
+  '<div class="f"><label for="ac">Confirm new password</label><input class="in" id="ac" type="password" autocomplete="new-password"></div>'+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+(S.info?'<div class="ok" style="margin-bottom:12px" role="status">'+esc(S.info)+'</div>':'')+
+  '<button class="btn full" data-rdo="1"'+(S.busy?' disabled':'')+'>Reset password</button><button class="lnk" data-mode="login" style="margin:14px auto 0;text-align:center">Back to log in</button></div></div>'}
+function fsz(b){return b<1048576?Math.max(1,Math.round(b/1024))+" KB":(b/1048576).toFixed(1)+" MB"}
+function shrink(f){return new Promise(function(res){if(f.type==="application/pdf"||f.type==="image/gif"||f.size<700000)return res(f);var im=new Image(),u=URL.createObjectURL(f);im.onload=function(){var k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);c.toBlob(function(b){URL.revokeObjectURL(u);res(b&&b.size<f.size?new File([b],f.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}):f)},"image/jpeg",.82)};im.onerror=function(){URL.revokeObjectURL(u);res(f)};im.src=u})}
+function sendFile(cid,f){return shrink(f).then(function(g){if(g.size>5242880)throw new Error(f.name+" is larger than 5 MB.");if(["application/pdf","image/jpeg","image/png","image/webp","image/gif"].indexOf(g.type)<0)throw new Error(f.name+": only PDF or image files can be added.");return fetch(API,{method:"POST",headers:{"x-session":TOK,"x-upload":"1","x-case":cid,"x-filename":encodeURIComponent(g.name),"Content-Type":g.type},body:g}).then(function(r){return r.json().then(function(j){if(r.status===401){out();throw new Error("auth")}if(!r.ok)throw new Error(j.error||"Upload failed.");return j})})})}
+function upload(fl){var c=get(S.id),list=[].slice.call(fl),n=$("dn"),errs=[],chain=Promise.resolve();if(n)n.textContent="Uploading…";list.forEach(function(f){chain=chain.then(function(){return sendFile(c.id,f)}).catch(function(e){if(e.message!=="auth")errs.push(e.message)})});chain.then(function(){return load()}).then(function(){S.info=errs.length?errs.join(" "):"Documents added.";draw()}).catch(function(){})}
+function match(c){var q=S.q.toLowerCase();
+  if(q&&(c.client+" "+c.id+" "+c.type).toLowerCase().indexOf(q)<0)return false;
+  if(S.day&&c.due!==S.day)return false;
+  if(S.t!=="All"&&c.type!==S.t)return false;
+  if(S.s!=="All staff"&&(S.s==="Unassigned"?c.staff_name:c.staff_name!==S.s))return false;
+  return S.f==="All"||(S.f==="Active"?c.status!=="Closed":c.status===S.f)}
+function rows(){return CASES.filter(match).sort(function(a,b){if((a.status==="Closed")!==(b.status==="Closed"))return a.status==="Closed"?1:-1;return (a.due||"9999").localeCompare(b.due||"9999")})}
+function items(r){
+  if(!r.length)return '<div class="empty">'+(isMgr()?'No cases match.<br>Tap “New case” to add one.':'No cases are assigned to you yet.')+'</div>';
+  return r.map(function(c){var si=ST.indexOf(c.status),lt=late(c);
+    return '<button class="row" data-open="'+c.id+'"><span class="ci s'+si+'">'+ic(SI[si])+'</span><span class="rt"><b>'+esc(c.client)+'</b><span class="sub">'+c.id+' · '+esc(c.type)+' · <span class="'+(lt?'late':'')+'">'+(lt?'Overdue ':'Due ')+fd(c.due)+'</span></span></span><span class="rr"><span class="tag '+c.pri+'">'+c.pri+'</span>'+(c.staff_name?av(c.staff_name,30):'')+'</span></button>'}).join('')}
+function calV(){
+  var y=S.cy,m=S.cm,first=new Date(y,m,1),off=(first.getDay()+6)%7,dim=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),t=iso(new Date()),n=off+dim>35?42:35,due={},cells=[];
+  CASES.forEach(function(c){if(c.due&&c.status!=="Closed")due[c.due]=1});
+  for(var i=0;i<n;i++){var dn,mo=m,o=false;if(i<off){dn=prev-off+i+1;mo=m-1;o=true}else if(i-off>=dim){dn=i-off-dim+1;mo=m+1;o=true}else dn=i-off+1;
+    var ds=iso(new Date(y,mo,dn));cells.push('<button class="d'+(o?' o':'')+(ds===t?' t':'')+(ds===S.day?' sel':'')+'" data-day="'+ds+'" aria-label="'+ds+(due[ds]?', cases due':'')+'">'+dn+(due[ds]?'<i></i>':'')+'</button>')}
+  return '<section class="cd cal o4"><div class="chead"><button class="ib sm" data-cm="-1" aria-label="Previous month">‹</button><b>'+first.toLocaleDateString([],{month:"long",year:"numeric"})+'</b><button class="ib sm" data-cm="1" aria-label="Next month">›</button></div><div class="cgrid">'+["M","T","W","T","F","S","S"].map(function(x){return'<span class="dow">'+x+'</span>'}).join('')+cells.join('')+'</div></section>'}
+function dashV(){
+  var vis=CASES,open=vis.filter(function(c){return c.status!=="Closed"}),t=iso(new Date()),n1=plus(1);
+  var hi=open.filter(function(c){return c.pri==="High"}).length,ov=open.filter(late).length,closed=vis.length-open.length,pct=vis.length?Math.round(closed*100/vis.length):0;
+  var filt=S.f!=="Active"||S.s!=="All staff"||S.q||S.day;
+  var chips=["Active","All"].concat(ST).map(function(o){return'<button class="chip'+(o===S.f?' on':'')+'" data-f="'+o+'">'+o+'</button>'}).join('')+(S.day?'<button class="chip on" data-clearday="1">Due '+fd(S.day)+' ✕</button>':'')+(S.s!=="All staff"?'<button class="chip on" data-sf="'+esc(S.s)+'">'+esc(S.s)+' ✕</button>':'');
+  var profile='<section class="cd o1"><div class="ph"><span class="ava">'+esc(ini(ME.name))+'</span><div style="display:flex;gap:8px"><button class="ib" data-lay="side" aria-label="Switch to sidebar layout" title="Sidebar layout">'+ic(I.layout)+'</button><button class="ib" data-logout="1" aria-label="Log out">'+ic(I.out)+'</button></div></div><h2>'+esc(ME.name)+'</h2><div class="sub big">'+(isMgr()?'Manager':'Staff')+'</div><div class="ocs"><span class="oc">'+open.length+' open</span><span class="oc">'+hi+' high priority</span><span class="oc">'+ov+' overdue</span></div>'+(isMgr()?'<button class="btn full" data-new="1">'+ic(I.plus)+' New case</button>':'')+'</section>';
+  var sn={};vis.forEach(function(c){if(c.staff_name)sn[c.staff_name]=1});var snames=Object.keys(sn).slice(0,5);
+  var prog='<section class="cd pg o2">'+ring(pct,56)+'<h2>Case progress</h2><p>'+closed+' of '+vis.length+' cases are closed. '+(ov?ov+' overdue need attention.':'Nothing is overdue.')+'</p>'+(snames.length?'<div class="stack" style="margin-top:6px">'+snames.map(function(k){return av(k,40)}).join('')+'</div>':'')+'</section>';
+  var cases='<section class="cd o3"><div class="ch"><h3>Cases</h3><span class="sub">'+rows().length+' shown</span></div><div class="search">'+ic(I.search)+'<input class="in" id="q" type="search" placeholder="Search client, ID or type" value="'+esc(S.q)+'"></div><div class="chips">'+chips+'</div><div id="cl">'+items(rows())+'</div></section>';
+  var rem=open.filter(function(c){return c.due&&c.due<=n1}).sort(function(a,b){return a.due.localeCompare(b.due)}).slice(0,6);
+  var remh='<section class="cd o5"><div class="ch"><h3>Reminders</h3><span class="badge" title="Due soon or overdue">'+open.filter(function(c){return c.due&&c.due<=n1}).length+'</span></div>'+(rem.length?rem.map(function(c){var si=ST.indexOf(c.status);return'<div class="nrow"><span class="ci s'+si+'">'+ic(SI[si])+'</span><span class="rt"><b>'+esc(c.client)+'</b><span class="sub '+(c.due<t?'late':'')+'">'+(c.due<t?'Overdue':c.due===t?'Due today':'Due tomorrow')+' · '+c.id+'</span></span><button class="btn alt sm" data-open="'+c.id+'">Open</button></div>'}).join(''):'<div class="sub">Nothing due today or tomorrow.</div>')+'<div class="ft"><button class="btn alt" data-clear="1">Clear filters</button><button class="btn" data-all="1">View all</button></div></section>';
+  var nxt=open.filter(function(c){return c.due}).sort(function(a,b){return a.due.localeCompare(b.due)})[0],soon='';
+  if(nxt){var dn=nxt.tasks.filter(function(x){return x.done}).length,tp=nxt.tasks.length?Math.round(dn*100/nxt.tasks.length):0;
+    soon='<section class="cd o6"><div class="ch"><h3>Next due</h3><button class="btn alt sm" data-open="'+nxt.id+'">View details</button></div><div style="font-weight:600;margin-bottom:12px">'+esc(nxt.client)+' <span class="sub">'+nxt.id+'</span></div><div class="due3"><div><span class="sub">Due date:</span><b class="'+(late(nxt)?'late':'')+'">'+fd(nxt.due)+'</b></div>'+ring(tp,56)+'<div><span class="sub">Assignee:</span><div style="margin-top:4px">'+(nxt.staff_name?av(nxt.staff_name,36):'<span class="sub">None</span>')+'</div></div></div></section>'}
+  var team='';
+  if(isMgr()){var cnt={};open.forEach(function(c){if(c.staff_name)cnt[c.staff_name]=(cnt[c.staff_name]||0)+1});
+    team='<section class="cd o7"><div class="ch"><h3>Team</h3><button class="btn alt sm" data-staff="1">Manage</button></div>'+(STAFF.length?STAFF.map(function(s){return'<div class="row"><span class="ci" style="background:transparent;padding:0">'+av(s.name,44)+'</span><span class="rt"><b>'+esc(s.name)+'</b><span class="sub">Staff · '+(cnt[s.name]||0)+' open</span></span><button class="ib sm" data-sf="'+esc(s.name)+'" aria-label="Show cases for '+esc(s.name)+'"'+(S.s===s.name?' style="background:var(--pri);color:var(--pi)"':'')+'>'+ic(I.filter,18)+'</button></div>'}).join(''):'<div class="sub">No staff registered yet.</div>')+'</section>'}
+  var integ='<section class="cd o8"><h3 style="margin-bottom:6px">Integrations</h3>'+(isMgr()?'<div class="ig"><span class="ci">'+ic(I.send)+'</span><span class="rt"><b>Telegram bot</b><span class="sub">'+(BOT?'Connected as @'+esc(BOT):'Add your bot token to start')+'</span></span><button class="sw'+(BOT?' on':'')+'" role="switch" aria-checked="'+(!!BOT)+'" aria-label="Telegram bot" data-sw="bot"><i></i></button></div>':'')+
+    '<div class="ig"><span class="ci">'+ic(I.users)+'</span><span class="rt"><b>My Telegram</b><span class="sub">Case updates and reminders</span></span><button class="sw'+(ME.telegram?' on':'')+'" role="switch" aria-checked="'+(!!ME.telegram)+'" aria-label="My Telegram" data-sw="me"><i></i></button></div>'+
+    '<div class="ig"><span class="ci">'+ic(I.doc)+'</span><span class="rt"><b>Documents</b><span class="sub">Private storage for PDFs and photos</span></span><span class="tag Low">On</span></div></section>';
+  return '<div class="page">'+info()+'<div class="dash"><div class="col">'+profile+cases+'</div><div class="col">'+calV()+remh+'</div><div class="col">'+prog+soon+team+integ+'</div></div></div>'}
+function rside(){
+  var open=CASES.filter(function(c){return c.status!=="Closed"}),t=iso(new Date()),n1=plus(1),w=plus(7),closed=CASES.length-open.length,pct=CASES.length?Math.round(closed*100/CASES.length):0;
+  var hi=open.filter(function(c){return c.pri==="High"}).length,ov=open.filter(late).length,wk=open.filter(function(c){return c.due&&c.due>=t&&c.due<=w}).length;
+  var rem=open.filter(function(c){return c.due&&c.due<=n1}).sort(function(a,b){return a.due.localeCompare(b.due)}).slice(0,6).map(function(c){return'<button class="lnk" data-open="'+c.id+'">'+(c.due<t?'Overdue':c.due===t?'Due today':'Due tomorrow')+' \u00b7 '+esc(c.client)+' ('+c.id+')</button>'}).join('');
+  var cnt={};open.forEach(function(c){if(c.staff_name)cnt[c.staff_name]=(cnt[c.staff_name]||0)+1});
+  return '<aside class="rp"><div class="rc">'+(isMgr()?'<button class="addbox" data-new="1">'+ic(I.upload,40)+'Add new case</button>':'<div style="text-align:center;padding:10px 0"><div style="font-size:34px;font-weight:600">'+open.length+'</div><div class="sub">Open cases assigned to you</div></div>')+'</div>'+
+   '<div class="rc"><h4>Case progress <em>'+(100-pct)+'% left</em></h4><div class="sub">'+closed+' of '+CASES.length+' cases are closed</div><div class="pbar"><i style="width:'+pct+'%"></i></div></div>'+
+   '<div class="mini"><div class="'+(hi?'hot':'')+'"><b>'+hi+'</b><span>High priority</span></div><div class="'+(ov?'hot':'')+'"><b>'+ov+'</b><span>Overdue</span></div><div><b>'+wk+'</b><span>Due in 7 days</span></div></div>'+
+   (rem?'<div class="rc"><h4>Reminders</h4>'+rem+'</div>':'')+
+   (isMgr()?'<div class="rc"><h4>Your team</h4>'+(STAFF.length?STAFF.map(function(s,i){return'<button class="fold c'+(i%3)+(S.s===s.name?' on':'')+'" data-sf="'+esc(s.name)+'"><span>'+esc(s.name)+'</span><span>'+(cnt[s.name]||0)+' open</span></button>'}).join(''):'<div class="sub">No staff registered yet.</div>')+'<button class="btn alt full sm" data-staff="1">+ Add or manage staff</button></div>':'')+
+   (ME.telegram?'':'<div class="rc"><button class="btn alt full" data-tglink="1">'+ic(I.send)+'Connect Telegram</button></div>')+'</aside>'}
+function sideList(){
+  var vis=CASES,cnt=ST.map(function(s){return vis.filter(function(c){return c.status===s}).length});
+  var tiles=ST.map(function(s,i){return'<button class="tile t'+i+(S.f===s?' on':'')+'" data-ft="'+s+'"><span class="ico">'+ic(SI[i])+'</span><span><b>'+s+'</b><small>'+cnt[i]+' case'+(cnt[i]===1?'':'s')+'</small></span></button>'}).join('');
+  var types=TYPES.map(function(k,i){var n=vis.filter(function(c){return c.type===k}).length;return'<button class="type k'+i+(S.t===k?' on':'')+'" data-tp="'+k+'">'+ic(TYI[k],24)+'<span><b>'+k+'</b><small>'+n+' case'+(n===1?'':'s')+'</small></span></button>'}).join('')+(isMgr()?'<button class="type plus" data-new="1" aria-label="New case">'+ic(I.plus,26)+'</button>':'');
+  var filt=S.f!=="Active"||S.t!=="All"||S.s!=="All staff"||S.q||S.day;
+  return '<div class="cols"><section>'+info()+'<div class="search">'+ic(I.search)+'<input class="in" id="q" type="search" placeholder="Search client, ID or type" value="'+esc(S.q)+'"></div><h3 class="sh">Status</h3><div class="tiles">'+tiles+'</div><h3 class="sh">Types</h3><div class="types">'+types+'</div><div class="sech"><h3>'+(S.f==="Active"?'Active cases':S.f==="All"?'All cases':S.f)+'</h3>'+(filt?'<button class="clr" data-clear="1">Clear filters</button>':'')+'</div><div id="cl">'+items(rows())+'</div></section>'+rside()+'</div>'}
+function sideShell(inner,act){var mg=isMgr();
+  var tabs=[['list','Cases',I.folder,'data-back="1"']].concat(mg?[['new','New',I.plus,'data-new="1"'],['staff','Staff',I.users,'data-staff="1"']]:[]);
+  var side=[tabs[0]].concat(mg?[tabs[2]]:[]);
+  return '<div class="sidewrap"><div class="shell"><aside class="side"><div class="me"><span class="avx">'+esc(ini(ME.name))+'</span><b>'+esc(ME.name)+'</b><small>'+(mg?'Manager':'Staff')+'</small></div>'+side.map(function(t){return'<button class="nv'+(act===t[0]?' on':'')+'" '+t[3]+'>'+ic(t[2])+t[1]+'</button>'}).join('')+(ME.telegram?'':'<button class="nv" data-tglink="1">'+ic(I.send)+'Connect Telegram</button>')+'<div class="grow"></div><button class="nv" data-lay="cards">'+ic(I.layout)+'Card layout</button><button class="nv" data-logout="1">'+ic(I.out)+'Log out</button></aside><main class="main"><div class="mtop"><span class="avx" style="width:34px;height:34px;font-size:12px;background:var(--soft);color:var(--pri)">'+esc(ini(ME.name))+'</span><b>Caseload</b><span class="grow"></span><span class="tag">'+(mg?'Manager':'Staff')+'</span></div>'+inner+'</main><nav class="tabbar" aria-label="Main">'+tabs.map(function(t){return'<button class="'+(act===t[0]?'on':'')+'" '+t[3]+'>'+ic(t[2],22)+t[1]+'</button>'}).join('')+'<button data-lay="cards">'+ic(I.layout,22)+'Layout</button><button data-logout="1">'+ic(I.out,22)+'Log out</button></nav></div></div>'}
+function staffSel(id,v){return '<select class="in" id="'+id+'"><option value="">Unassigned</option>'+STAFF.map(function(s){return'<option value="'+s.id+'"'+(s.id===v?' selected':'')+'>'+esc(s.name)+'</option>'}).join('')+'</select>'}
+function top(t){return '<div class="topbar"><button class="ib" data-back="1" aria-label="Back">'+ic(I.back)+'</button><span class="sub">'+t+'</span><span style="width:48px"></span></div>'}
+function newV(){
+  return '<div class="page"><div class="wrap">'+top('New case')+'<div class="hero"><h2>New case</h2></div><div class="panel"><div class="f"><label for="nc">Client name</label><input class="in" id="nc" autocomplete="off"></div>'+
+  '<div class="grid2"><div class="f"><label for="nt">Type</label>'+sel("nt",TYPES,"Memo")+'</div><div class="f"><label for="nr">Priority</label>'+sel("nr",PR,"Medium")+'</div></div><div class="f"><label for="nd">Due date</label><input class="in" type="date" id="nd" value="'+plus(7)+'"></div>'+
+  '<div class="f"><label for="na">Assigned to</label>'+staffSel("na","")+'</div><div class="f"><label for="ns">Summary</label><textarea class="in" id="ns" rows="3"></textarea></div>'+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+'<button class="btn full" data-create="1"'+(S.busy?' disabled':'')+'>Create case</button></div></div></div>'}
+function caseV(c){var m=isMgr();
+  return '<div class="page"><div class="wrap">'+top(esc(c.id))+info()+'<div class="hero"><span class="tag '+c.pri+'">'+c.pri+' priority</span> <span class="tag">'+esc(c.type)+'</span><h2>'+esc(c.client)+'</h2><div class="sub">'+(c.summary?esc(c.summary):'No summary')+'</div></div>'+
+  '<div class="panel"><label>Status</label><div class="seg" role="group" aria-label="Status">'+ST.map(function(s){return'<button class="'+(s===c.status?'on':'')+'" data-st="'+s+'">'+s+'</button>'}).join('')+'</div></div>'+
+  '<div class="panel"><div class="grid2"><div class="f"><label for="fp">Priority</label>'+sel("fp",PR,c.pri,!m,"pri")+'</div><div class="f"><label for="fdv">Due</label><input class="in" type="date" id="fdv" data-fld="due" value="'+esc(c.due||"")+'"'+(m?'':' disabled')+'></div></div>'+
+  '<div class="f" style="margin-bottom:0"><label for="fa">Assigned to</label>'+(m?staffSel("fa",c.staff_id).replace('<select class="in" id="fa"','<select class="in" id="fa" data-fld="staff_id"'):'<div>'+esc(c.staff_name||"Unassigned")+'</div>')+'</div></div>'+
+  '<div class="panel"><h4>Documents</h4>'+((c.docs||[]).length?c.docs.map(function(x){return'<div class="task"><span>'+(x.mime==="application/pdf"?'PDF':'Image')+' · '+esc(x.name)+'<div class="sub">'+fsz(x.size)+'</div></span><button class="btn alt sm" data-doc="'+x.id+'">Open</button>'+(m?'<button class="x" data-rdoc="'+x.id+'" aria-label="Remove document">×</button>':'')+'</div>'}).join(''):'<div class="sub">No documents yet.</div>')+(m?'<label class="btn alt full" for="fu" style="margin-top:12px;color:var(--ink);font-size:15px">+ Add PDF or image</label><input type="file" id="fu" accept="application/pdf,image/*" multiple hidden><div class="sub" id="dn" style="margin-top:8px">PDF or image, up to 5 MB each.</div>':'')+'</div>'+
+  '<div class="panel"><h4>Tasks</h4>'+(c.tasks.length?c.tasks.map(function(t){return'<div class="task'+(t.done?' d':'')+'"><input type="checkbox" data-tt="'+t.id+'" aria-label="Done"'+(t.done?' checked':'')+(m?'':' disabled')+'><span>'+esc(t.text)+'</span>'+(m?'<button class="x" data-rt="'+t.id+'" aria-label="Remove task">×</button>':'')+'</div>'}).join(''):'<div class="sub">No tasks yet.</div>')+(m?'<div class="addrow"><input class="in" id="nt2" placeholder="Add a task"><button class="btn" data-addtask="1">Add</button></div>':'')+'</div>'+
+  '<div class="panel"><h4>Case notes</h4>'+(m?'<textarea class="in" id="nn" rows="3" placeholder="Write a note about contact, decisions or next steps"></textarea><button class="btn full" data-addnote="1" style="margin:10px 0 16px">Save note</button>':'')+(c.notes.length?c.notes.map(function(n){return'<div class="note"><div class="sub">'+esc(n.author||"")+' · '+new Date(n.ts).toLocaleString([],{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})+'</div><p>'+esc(n.text)+'</p></div>'}).join(''):'<div class="sub">No notes yet.</div>')+'</div>'+
+  (m?'<button class="btn warn full" data-del="1">'+(S.del?'Tap again to delete this case':'Delete case')+'</button>':'')+'</div></div>'}
+function staffV(){
+  return '<div class="page"><div class="wrap">'+top('Staff')+'<div class="hero"><h2>Staff</h2></div>'+info()+
+  '<div class="panel"><h4>Telegram bot</h4>'+(BOT?'<p style="margin:0 0 6px" class="ok">Connected: @'+esc(BOT)+'</p><div class="sub">Everyone taps “My Telegram” on the dashboard to receive updates.</div>':'<div class="sub" style="margin-bottom:12px">Create a bot with @BotFather in Telegram, then paste its token here. The token is stored on the server only.</div><div class="f"><label for="bt">Bot token</label><input class="in" id="bt" type="password" autocomplete="off"></div><button class="btn full" data-bot="1"'+(S.busy?' disabled':'')+'>Connect bot</button>')+'</div>'+
+  '<div class="panel"><h4>Register staff</h4><div class="sub" style="margin-bottom:12px">Staff sign up and log in with their record card number. If you leave the mobile blank it is linked when they sign up.</div><div class="f"><label for="sn">Name</label><input class="in" id="sn" autocomplete="off"></div><div class="f"><label for="sm">Mobile number (optional)</label><input class="in" id="sm" inputmode="tel"></div><div class="f"><label for="sc">Record card number</label><input class="in" id="sc" autocomplete="off"></div>'+
+  (S.err?'<div class="late" style="margin-bottom:12px" role="alert">'+esc(S.err)+'</div>':'')+'<button class="btn full" data-addstf="1">Add staff</button></div>'+
+  '<div class="panel"><h4>Registered staff</h4>'+(STAFF.length?STAFF.map(function(x){return'<div class="task">'+av(x.name,40)+'<span>'+esc(x.name)+'<div class="sub">'+(x.mobile?esc(x.mobile):'Not signed up yet')+' · Card '+esc(x.card)+(x.telegram?' · Telegram connected':'')+'</div></span>'+(x.signed_up?'<button class="btn alt sm" data-rissue="'+x.id+'">Reset code</button>':'')+'<button class="x" data-rmstf="'+x.id+'" aria-label="Remove staff">×</button></div>'}).join(''):'<div class="sub">No staff registered yet.</div>')+'</div></div></div>'}
+function draw(){var a=$("app"),sd=LAY==="side"&&ME&&S.v!=="auth";document.body.className=sd?"side":"";
+  function w(h,act){return sd?sideShell(h,act):h}
+  if(!ME||S.v==="auth")a.innerHTML=S.mode==="reset"?resetV():authV();
+  else if(S.v==="staff"&&isMgr())a.innerHTML=w(staffV(),"staff");
+  else if(S.v==="new"&&isMgr())a.innerHTML=w(newV(),"new");
+  else if(S.v==="case"&&get(S.id))a.innerHTML=w(caseV(get(S.id)),"list");
+  else{S.v="list";a.innerHTML=sd?sideShell(sideList(),"list"):dashV()}
+  clearTimeout(TMR);if(S.info&&$("info")&&S.info.indexOf("Reset code")!==0)TMR=setTimeout(function(){S.info="";var e=$("info");if(e)e.remove()},5000)}
+function run(p,done){S.busy=true;S.err="";draw();return p.then(function(r){S.busy=false;if(done)return done(r)}).catch(function(e){S.busy=false;if(e.message!=="auth"){S.err=e.message}draw()})}
+function reload(msg){return load().then(function(){S.info=msg||"";draw()}).catch(function(e){if(e.message!=="auth"){S.err=e.message;draw()}})}
+function act(p,msg){return p.then(function(){return reload(msg)}).catch(function(e){if(e.message!=="auth"){S.info=e.message;draw()}})}
+function enter(j){TOK=j.token;ME=j.user;try{localStorage.setItem("caseload-token",TOK)}catch(e){}return load().then(function(){S.v="list";S.err="";S.info="";draw()})}
+function tglink(){call("tg_link").then(function(r){window.open(r.url,"_blank","noopener");S.info="Telegram opened. Tap Start in the bot chat, then come back here.";draw()}).catch(function(er){S.info=er.message;draw()})}
+$("app").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;var d=b.dataset,c=get(S.id);
+  if(d.mode){S.mode=d.mode;S.err="";S.info="";draw()}
+  else if(d.rreq){var rm=$("am").value;if(!rm.trim()){S.err="Enter your mobile number first.";draw();return}call("reset_request",{mobile:rm}).then(function(){S.err="";S.info="If your account has Telegram connected, a code was sent there.";draw();$("am").value=rm}).catch(function(er){S.err=er.message;draw()})}
+  else if(d.rdo){var m2=$("am").value,cd=$("ar").value,code=$("rc").value,p1=$("ap").value;if(p1!==$("ac").value){S.err="Passwords do not match.";S.info="";draw();return}run(call("reset_do",{mobile:m2,card:cd,code:code,password:p1}),function(){S.mode="login";S.err="";S.info="Password changed. Log in with your new password.";draw()})}
+  else if(d.go){var su=S.mode==="signup",m=$("am").value,pw=$("ap").value,card=$("ar").value;
+    if(su&&pw!==$("ac").value){S.err="Passwords do not match.";draw();return}
+    run(call(su?"signup":"login",{name:su?$("an").value:"",mobile:m,password:pw,card:card}),enter)}
+  else if(d.logout){call("logout").catch(function(){});out()}
+  else if(d.f){S.f=d.f;draw()}
+  else if(d.sf){S.s=S.s===d.sf?"All staff":d.sf;draw()}
+  else if(d.day){S.day=S.day===d.day?"":d.day;S.f=S.day?"All":"Active";draw()}
+  else if(d.cm){S.cm+=+d.cm;if(S.cm<0){S.cm=11;S.cy--}if(S.cm>11){S.cm=0;S.cy++}draw()}
+  else if(d.clearday){S.day="";S.f="Active";draw()}
+  else if(d.clear){S.f="Active";S.s="All staff";S.t="All";S.q="";S.day="";draw()}
+  else if(d.all){S.f="All";S.s="All staff";S.t="All";S.q="";S.day="";draw()}
+  else if(d.lay){LAY=d.lay;try{localStorage.setItem("caseload-layout",LAY)}catch(e){}S.t="All";draw();window.scrollTo(0,0)}
+  else if(d.ft){S.f=S.f===d.ft?"Active":d.ft;draw()}
+  else if(d.tp){S.t=S.t===d.tp?"All":d.tp;draw()}
+  else if(d.tglink){tglink()}
+  else if(d.sw==="me"){if(ME.telegram){S.info="Telegram is connected. You will get updates there.";draw()}else tglink()}
+  else if(d.sw==="bot"){S.v="staff";S.err="";S.info="";draw();window.scrollTo(0,0)}
+  else if(d.st){act(call("case_update",{id:c.id,fields:{status:d.st}}),"Status updated.")}
+  else if(d.open){S.v="case";S.id=d.open;S.del=false;S.info="";draw();window.scrollTo(0,0)}
+  else if(d.back){S.v="list";S.err="";S.info="";S.del=false;draw();window.scrollTo(0,0)}
+  else if(d.new){S.v="new";S.err="";draw();window.scrollTo(0,0)}
+  else if(d.staff){S.v="staff";S.err="";S.info="";draw();window.scrollTo(0,0)}
+  else if(d.create){var n=$("nc").value.trim();if(!n){$("nc").focus();return}
+    run(call("case_create",{client:n,type:$("nt").value,pri:$("nr").value,due:$("nd").value,summary:$("ns").value,staff_id:$("na").value}),function(r){return load().then(function(){S.v="case";S.id=r.id;S.info="Case opened. The assigned staff and manager were notified on Telegram if connected.";draw();window.scrollTo(0,0)})})}
+  else if(d.addtask){var t=$("nt2").value.trim();if(t)act(call("task_add",{id:c.id,text:t}))}
+  else if(d.rt){act(call("task_remove",{task:+d.rt}))}
+  else if(d.addnote){var x=$("nn").value.trim();if(x)act(call("note_add",{id:c.id,text:x}))}
+  else if(d.del){if(!S.del){S.del=true;draw()}else call("case_delete",{id:c.id}).then(function(){S.v="list";S.del=false;return reload()}).catch(function(){})}
+  else if(d.addstf){S.err="";call("staff_add",{name:$("sn").value,mobile:$("sm").value,card:$("sc").value}).then(function(){return load()}).then(draw).catch(function(er){if(er.message!=="auth"){S.err=er.message;draw()}})}
+  else if(d.rmstf){call("staff_remove",{id:d.rmstf}).then(load).then(draw).catch(function(){})}
+  else if(d.doc){var w=window.open("","_blank");call("doc_url",{id:+d.doc}).then(function(r){if(w)w.location=r.url;else location.href=r.url}).catch(function(er){if(w)w.close();S.info=er.message;draw()})}
+  else if(d.rdoc){act(call("doc_remove",{id:+d.rdoc}),"Document removed.")}
+  else if(d.rissue){call("reset_issue",{id:d.rissue}).then(function(r){S.info="Reset code: "+r.code+" (valid 24 hours). Give it to the staff member.";draw()}).catch(function(er){S.info=er.message;draw()})}
+  else if(d.bot){var tk=$("bt").value;run(call("bot_setup",{token:tk}),function(r){BOT=r.username;draw()})}
+});
+$("app").addEventListener("change",function(e){var t=e.target,c=get(S.id);
+  if(t.dataset.tt)act(call("task_toggle",{task:+t.dataset.tt,done:t.checked}));
+  else if(t.dataset.fld){var f={};f[t.dataset.fld]=t.value;act(call("case_update",{id:c.id,fields:f}),"Saved.")}
+  else if(t.id==="fu"){upload(t.files)}
+});
+$("app").addEventListener("input",function(e){if(e.target.id==="q"){S.q=e.target.value;$("cl").innerHTML=items(rows())}});
+$("app").addEventListener("keydown",function(e){if(e.key==="Enter"&&S.v==="auth"&&e.target.tagName==="INPUT"){var g=document.querySelector("[data-go]");if(g)g.click()}});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&ME&&S.v==="list")call("me").then(function(j){ME=j.user;return load()}).then(draw).catch(function(){})});
+boot();
+})();
+</script>
+</body>
+</html>
